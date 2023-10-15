@@ -1,13 +1,17 @@
 #include <ESP8266WiFi.h>
 #include <NTPClient.h>
 #include <WiFiUdp.h>
-#include <TOTP.h>
+
+#include <ESP8266WebServer.h>
+#include <ESP8266mDNS.h>  // For mDNS support
+#include <FS.h>
+#include <TOTP.h> // For Time-based One Time Passwords
 
 // Replace with your network credentials
 const char* ssid = "";
 const char* password = "";
 
-// Define NTP Server and Time Zone
+// Define NTP Server and Time Zone (remember, most authenticator apps will use the default values, UTC0, to avoid timezone issues)
 const char* ntpServerName = "pool.ntp.org";
 const int timeZone = 0; // Change this to your time zone offset in seconds
 const int daylightOffset = 0; // x hour offset for Daylight Saving Time (DST)
