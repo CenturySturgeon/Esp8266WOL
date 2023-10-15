@@ -7,6 +7,9 @@
 #include <FS.h>
 #include <TOTP.h> // For Time-based One Time Passwords
 
+// Import the html header file
+#include "index_html.h"
+
 // Replace with your network credentials
 const char* ssid = "";
 const char* password = "";
@@ -53,6 +56,13 @@ void setup() {
   // Initialize the time client
   timeClient.begin();
   timeClient.update();
+
+  // Define the root path to serve the HTML file
+  server.on("/", HTTP_GET, []() {
+    server.send(200, "text/html", index_html);
+  });
+
+  server.begin();
 }
 
 void loop() {
@@ -62,10 +72,11 @@ void loop() {
   // Serial.println(timeClient.getFormattedTime());
   
   // generate the TOTP code and, if different from the previous one, print to screen
-  String newCode = String(totp.getCode(timeClient.getEpochTime()));
-  if(totpCode!= newCode) {
-    totpCode = String(newCode);
-    Serial.print("TOTP code: ");
-    Serial.println(newCode);
-  }
+  // String newCode = String(totp.getCode(timeClient.getEpochTime()));
+  // if(totpCode!= newCode) {
+  //   totpCode = String(newCode);
+  //   Serial.print("TOTP code: ");
+  //   Serial.println(newCode);
+  // }
+  server.handleClient();
 }
