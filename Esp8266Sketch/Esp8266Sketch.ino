@@ -16,6 +16,14 @@ const char* ntpServerName = "pool.ntp.org";
 const int timeZone = 0; // Change this to your time zone offset in seconds
 const int daylightOffset = 0; // x hour offset for Daylight Saving Time (DST)
 
+// Set static IP address
+IPAddress staticIP(192, 168, 7, 77);
+IPAddress gateway(192, 168, 1, 1);
+IPAddress subnet(255, 255, 255, 0);
+
+// Set the webserver on port XX
+ESP8266WebServer server(80);
+
 WiFiUDP udp;
 NTPClient timeClient(udp, ntpServerName, timeZone);
 
@@ -28,6 +36,11 @@ String totpCode = String("");
 void setup() {
   // Start Serial for debugging
   Serial.begin(115200);
+
+  // Configures static IP address
+  if (!WiFi.config(staticIP, gateway, subnet)) {
+    Serial.println("STA Failed to configure");
+  }
 
   // Connect to Wi-Fi
   WiFi.begin(ssid, password);
