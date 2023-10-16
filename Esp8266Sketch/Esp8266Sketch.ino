@@ -62,6 +62,15 @@ void setup() {
     server.send(200, "text/html", index_html);
   });
 
+  // Handle the form submission
+  server.on("/submit", HTTP_POST, []() {
+    String inputText = server.arg("inputText");
+    Serial.print("Submitted Text: ");
+    Serial.println(inputText);
+    String newCode = String(totp.getCode(timeClient.getEpochTime()));
+    server.send(200, "text/html", "You submitted: " + inputText + " The real code: " + newCode);
+  });
+
   server.begin();
 }
 
