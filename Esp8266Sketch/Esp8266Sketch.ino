@@ -9,18 +9,14 @@
 
 // Import the html header file
 #include "index_html.h"
-
-// Replace with your network credentials
-const char* ssid = "";
-const char* password = "";
+// Import the environment variables (ssid, password, static IP & hmacKey)
+#include "envVariables.h"
 
 // Define NTP Server and Time Zone (remember, most authenticator apps will use the default values, UTC0, to avoid timezone issues)
 const char* ntpServerName = "pool.ntp.org";
 const int timeZone = 0; // Change this to your time zone offset in seconds
 const int daylightOffset = 0; // x hour offset for Daylight Saving Time (DST)
 
-// Set static IP address
-IPAddress staticIP(192, 168, 7, 77);
 IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
 
@@ -29,8 +25,6 @@ ESP8266WebServer server(80);
 
 WiFiUDP udp;
 NTPClient timeClient(udp, ntpServerName, timeZone);
-
-uint8_t hmacKey[] = {  };
 
 TOTP totp = TOTP(hmacKey, 10);
 
