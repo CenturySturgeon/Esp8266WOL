@@ -18,7 +18,7 @@ const int timeZone = 0; // Change this to your time zone offset in seconds
 const int daylightOffset = 0; // x hour offset for Daylight Saving Time (DST)
 
 IPAddress subnet(255, 255, 255, 0);
-IPAddress dns(1, 1, 1, 1);            // Cloudflare dns (can be another one like google's or a local one of your choice)
+IPAddress dns(1, 1, 1, 1);            // Cloudflare DNS (can be another one like google's or a local one of your choice)
 
 // Set the webserver on port XX
 ESP8266WebServer server(80);
