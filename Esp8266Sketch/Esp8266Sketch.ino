@@ -3,8 +3,6 @@
 #include <WiFiUdp.h>
 
 #include <ESP8266WebServer.h>
-#include <ESP8266mDNS.h>  // For mDNS support
-#include <FS.h>
 #include <TOTP.h> // For Time-based One Time Passwords
 
 // Import the html header file
@@ -18,9 +16,9 @@ const int timeZone = 0; // Change this to your time zone offset in seconds
 const int daylightOffset = 0; // x hour offset for Daylight Saving Time (DST)
 
 IPAddress subnet(255, 255, 255, 0);
-IPAddress dns(1, 1, 1, 1);            // Cloudflare DNS (can be another one like google's or a local one of your choice)
+IPAddress dns(1, 1, 1, 1);            // Cloudflare DNS (can be another like google's or a local one of your choice)
 
-// Set the webserver on port XX
+// Set the webserver on port 80
 ESP8266WebServer server(80);
 
 WiFiUDP udp;
@@ -34,9 +32,9 @@ void setup() {
   // Start Serial for debugging
   Serial.begin(115200);
 
-  // Set the Wi-Fi mode to station (the Soc connects as a client instead of becoming an access point)
+  // Set the WiFi mode to station (the Soc connects as a client to the WiFi, instead of becoming an access point)
   WiFi.mode(WIFI_STA);
-  // Connect to Wi-Fi
+  // Connect to WiFi
   WiFi.begin(ssid, password);
   // Configures static IP address
   WiFi.config(staticIP, gateway, subnet, dns);
