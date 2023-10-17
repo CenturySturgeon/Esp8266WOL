@@ -28,6 +28,29 @@ TOTP totp = TOTP(hmacKey, 10);
 
 String totpCode = String("");
 
+String getPublicIp()
+{
+  WiFiClient client;
+  if (client.connect("api.ipify.org", 80)) 
+  {
+      Serial.println("connected");
+      client.println("GET / HTTP/1.0");
+      client.println("Host: api.ipify.org");
+      client.println();
+  } else {
+      Serial.println("Connection to ipify.org failed");
+      return String();
+  }
+  delay(5000);
+  String line;
+  while(client.available())
+  {
+    line = client.readStringUntil('\n');
+    // Serial.println(line);
+  }
+  return line;
+}
+
 void setup() {
   // Start Serial for debugging
   Serial.begin(115200);
@@ -66,6 +89,9 @@ void setup() {
   });
 
   server.begin();
+
+  String publicIP = getPublicIp();
+  Serial.println( "your ip" + publicIP);
 }
 
 void loop() {
