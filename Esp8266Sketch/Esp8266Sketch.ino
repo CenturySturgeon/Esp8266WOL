@@ -96,7 +96,6 @@ void setup() {
   } 
   Serial.println("Connected to WiFi with IP: ");
   Serial.println(WiFi.localIP());
-  configTime(3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
 
   // Initialize the time client
   timeClient.begin();
