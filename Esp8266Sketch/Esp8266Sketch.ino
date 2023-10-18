@@ -3,6 +3,8 @@
 #include <WiFiUdp.h>
 
 #include <ESP8266WebServer.h>
+#include <ESP8266WebServerSecure.h>
+#include <ESP8266mDNS.h>
 #include <TOTP.h> // For Time-based One Time Passwords
 
 // Import the html header file
@@ -19,7 +21,8 @@ IPAddress subnet(255, 255, 255, 0);
 IPAddress dns(1, 1, 1, 1);            // Cloudflare DNS (can be another like google's or a local one of your choice)
 
 // Set the webserver on port 80
-ESP8266WebServer server(80);
+BearSSL::ESP8266WebServerSecure server(443);
+BearSSL::ServerSessions serverCache(5);
 
 WiFiUDP udp;
 NTPClient timeClient(udp, ntpServerName, timeZone);
@@ -81,11 +84,11 @@ void setup() {
   Serial.begin(115200);
 
   // Set the WiFi mode to station (the Soc connects as a client to the WiFi, instead of becoming an access point)
-  WiFi.mode(WIFI_STA);
+  // WiFi.mode(WIFI_STA);
   // Connect to WiFi
   WiFi.begin(ssid, password);
   // Configures static IP address
-  WiFi.config(staticIP, gateway, subnet, dns);
+  // WiFi.config(staticIP, gateway, subnet, dns);
   // Retry connection until success
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
@@ -93,10 +96,21 @@ void setup() {
   } 
   Serial.println("Connected to WiFi with IP: ");
   Serial.println(WiFi.localIP());
+  configTime(3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
 
   // Initialize the time client
   timeClient.begin();
   timeClient.update();
+
+  if (MDNS.begin("esp8266")) {
+    Serial.println("MDNS responder started");
+  }
+
+  // Add the openssl cert and private key
+  server.getServer().setRSACert(new BearSSL::X509List(serverCert), new   BearSSL::PrivateKey(serverKey));
+
+  // Cache SSL sessions to accelerate the TLS handshake.
+  server.getServer().setCache(&serverCache);
 
   // Define the root path to serve the HTML file
   server.on("/", HTTP_GET, []() {
@@ -125,4 +139,5 @@ void loop() {
   // Serial.println(timeClient.getFormattedTime());
 
   server.handleClient();
+  MDNS.update();
 }
