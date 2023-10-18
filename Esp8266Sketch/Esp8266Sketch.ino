@@ -84,11 +84,11 @@ void setup() {
   Serial.begin(115200);
 
   // Set the WiFi mode to station (the Soc connects as a client to the WiFi, instead of becoming an access point)
-  // WiFi.mode(WIFI_STA);
+  WiFi.mode(WIFI_STA);
   // Connect to WiFi
   WiFi.begin(ssid, password);
   // Configures static IP address
-  // WiFi.config(staticIP, gateway, subnet, dns);
+  WiFi.config(staticIP, gateway, subnet, dns);
   // Retry connection until success
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
