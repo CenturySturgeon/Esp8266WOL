@@ -85,52 +85,85 @@ String getPublicIp() {
 // UserSession struct for the handling of session data
 struct UserSession
 {
-  const char* username;
-  const char* password;
+  String username;
+  String password;
   IPAddress ip;
   bool isLoggedIn;
   ;
 };
 
-// Define an array that holds the sessions
+// User session array for the handling of session states (default should always have no session)
 UserSession userSessions[2] = {
-    { "admin", "admin", IPAddress(0, 0, 0, 0), false },
-    { "user", "user", IPAddress(0, 0, 0, 0), false }
+    // 127.0.0.1 corresponds to the loopback address (localhost) and is not routable on the public internet
+    { "admin", "admin", IPAddress(127, 0, 0, 1), false },
+    { "user", "user", IPAddress(127, 0, 0, 1), false }
 };
 
-// Simple function to check if a client has already an active session using his ip
-bool is_authenticated(IPAddress ip)
-{
+// Simple function to check if a client ip has already an active session
+bool is_authenticated(IPAddress ip) {
   Serial.println("Inside is authenticated");
-  for (int i = 0; i < 2; i++)
-  {
-    Serial.println(ip.toString());
-    Serial.println(userSessions[i].ip.toString());
-    if (userSessions[i].ip == ip)
-    {
+  for (int i = 0; i < 2; i++) {
+    if (userSessions[i].ip == ip && userSessions[i].isLoggedIn) {
+      Serial.println("Found match");
       return true;
     }
   }
   return false;
 }
 
-void handleAuthentication(IPAddress ip)
-{
-  server.send(200, "text/plain", "not authenticated!");
+// Simple function that looks that the provided credentials match with the credentials on the array
+bool credentialsMatch(String username, String password) {
+  Serial.println("Inside credentialsMatch");
+  for (int i = 0; i < 2; i++) {
+    if (userSessions[i].username == username && userSessions[i].password == password) {
+      return true;
+    }
+  }
+  return false;
 }
 
-void handleRoot()
-{
-  IPAddress clientIP = server.client().remoteIP(); // Get the client's IP address
-  Serial.println(clientIP);
-  is_authenticated(clientIP);
+// Assigns the ip a session to the provided user name
+void assignSession(String username, IPAddress ip) {
+  Serial.println("Inside assignSession");
+  for (int i = 0; i < 2; i++) {
+    if (userSessions[i].username == username) {
+      userSessions[i].ip = ip;
+      userSessions[i].isLoggedIn = true;
+    }
+  }
+}
 
-  if (!is_authenticated(clientIP))
-  {
-    server.send(200, "text/html", login_html);
+void handleAuthentication(String username, String password, IPAddress ip) {
+  Serial.println("Inside handleAuthentication");
+  bool clientAuthenticated = is_authenticated(ip);
+  bool goodCredentials = credentialsMatch(username, password);
+
+  if (clientAuthenticated) {
+    Serial.println("Inside handleAuthentication");
+    server.send(200, "text/plain", "Welcome to the protected page!");
+  } else {
+    Serial.println("Client was not auth");
+    if (goodCredentials) {
+      assignSession(username, ip);
+      server.send(200, "text/plain", "Welcome to the protected page!");
+    } else {
+      server.send(200, "text/plain", "Bad Authentication!");
+    }
   }
 
-  server.send(200, "text/plain", "Welcome to the protected page!");
+}
+
+void handleRoot() {
+  Serial.println("Inside handleRoot");
+  IPAddress clientIP = server.client().remoteIP(); // Get the client's IP address
+  Serial.println(clientIP);
+
+  if (!is_authenticated(clientIP)) {
+    server.send(200, "text/html", login_html);
+  } else {
+    server.send(200, "text/plain", "Welcome to the protected page!");
+  }
+
 }
 
 void setup()
@@ -172,6 +205,15 @@ void setup()
   // });
 
   server.on("/", HTTP_GET, handleRoot);
+
+  // Handle the login submission
+  server.on("/login", HTTP_POST, []() {
+    timeClient.update();
+    String username = server.arg("username");
+    String password = server.arg("password");
+    IPAddress clientIP = server.client().remoteIP(); // Get the client's IP address
+    handleAuthentication(username, password, clientIP);
+    });
 
   // Handle the form submission
   server.on("/submit", HTTP_POST, []() {
