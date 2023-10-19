@@ -27,6 +27,7 @@ BearSSL::ServerSessions serverCache(5);
 WiFiUDP udp;
 NTPClient timeClient(udp, ntpServerName, timeZone);
 
+// Set the TOTP key to be used for code generation
 TOTP totp = TOTP(hmacKey, 10);
 
 String totpCode = String("");
@@ -79,6 +80,47 @@ String getPublicIp() {
   return String();  // Return an empty string after 3 failed attempts
 }
 
+// Set session username and password
+const char* http_username = "admin";
+const char* http_password = "admin";
+
+struct UserSession {
+  bool authenticated;
+};
+
+UserSession userSessions[2];  // Adjust the array size as needed
+
+// Simple hash function to convert an IP address to a unique integer
+int ipToSessionId(IPAddress ipAddress) {
+  uint32_t ip = ipAddress;
+  return (int)(ip % 5);  // Using modulo to limit the session IDs
+}
+
+bool is_authenticated(int sessionId) {
+  return userSessions[sessionId].authenticated;
+}
+
+void handleAuthentication(int sessionId) {
+  if (server.authenticate(http_username, http_password)) {
+    userSessions[sessionId].authenticated = true;
+  }
+}
+
+void handleRoot() {
+  IPAddress clientIP = server.client().remoteIP(); // Get the client's IP address
+  int sessionId = ipToSessionId(clientIP); // Use a hash of the IP as the session ID
+
+  if (!is_authenticated(sessionId)) {
+    handleAuthentication(sessionId);
+  }
+
+  if (!is_authenticated(sessionId)) {
+    return server.requestAuthentication();
+  }
+
+  server.send(200, "text/plain", "Welcome to the protected page!");
+}
+
 void setup() {
   // Start Serial for debugging
   Serial.begin(115200);
@@ -111,10 +153,12 @@ void setup() {
   // Cache SSL sessions to accelerate the TLS handshake.
   server.getServer().setCache(&serverCache);
 
-  // Define the root path to serve the HTML file
-  server.on("/", HTTP_GET, []() {
-    server.send(200, "text/html", index_html);
-  });
+  // // Define the root path to serve the HTML file
+  // server.on("/", HTTP_GET, []() {
+  //   server.send(200, "text/html", index_html);
+  // });
+
+  server.on("/", HTTP_GET, handleRoot);
 
   // Handle the form submission
   server.on("/submit", HTTP_POST, []() {
