@@ -6,7 +6,6 @@
 #include <ESP8266WebServerSecure.h>
 #include <ESP8266mDNS.h>
 #include <TOTP.h> // For Time-based One Time Passwords
-#include <unordered_map>
 
 // Import the html files
 #include "index_html.h"
@@ -22,9 +21,11 @@ const int daylightOffset = 0; // x hour offset for Daylight Saving Time (DST)
 IPAddress subnet(255, 255, 255, 0);
 IPAddress dns(1, 1, 1, 1); // Cloudflare DNS (can be another like google's or a local one of your choice)
 
-// Set the webserver on port 80
+// Set the main webserver on port 443 (HTTPS)
 BearSSL::ESP8266WebServerSecure server(443);
 BearSSL::ServerSessions serverCache(5);
+// Set a secondary web server for HTTP redirection to HTTPS
+ESP8266WebServer serverHTTP(80);
 
 WiFiUDP udp;
 NTPClient timeClient(udp, ntpServerName, timeZone);
@@ -32,6 +33,7 @@ NTPClient timeClient(udp, ntpServerName, timeZone);
 // Set the TOTP key to be used for code generation
 TOTP totp = TOTP(hmacKey, 10);
 
+// Initial value for the TOTP code
 String totpCode = String("");
 
 // getPublicIp attempts 3 times to get the router's public ip, waiting 5 seconds for each reattempt
@@ -111,7 +113,7 @@ bool is_authenticated(IPAddress ip) {
   return false;
 }
 
-// Simple function that looks that the provided credentials match with the credentials on the array
+// Simple function that checks the provided credentials match with the credentials on the array
 bool credentialsMatch(String username, String password) {
   Serial.println("Inside credentialsMatch");
   for (int i = 0; i < 2; i++) {
@@ -164,6 +166,11 @@ void handleRoot() {
     server.send(200, "text/plain", "Welcome to the protected page!");
   }
 
+}
+// Redirects incoming HTTP trafic to the HTTPS server
+void secureRedirect() {
+  serverHTTP.sendHeader("Location", String("https://esp8266.local"), true);
+  serverHTTP.send(301, "text/plain", "");
 }
 
 void setup()
@@ -225,7 +232,11 @@ void setup()
     server.send(200, "text/html", "You submitted: " + inputText + " The real code: " + newCode + " " + timeClient.getFormattedTime());
     });
 
+  // Redirect all users using HTTP to the HTTPS server
+  serverHTTP.on("/", HTTP_GET, secureRedirect);
+
   server.begin();
+  serverHTTP.begin();
 
   String publicIP = getPublicIp();
 }
@@ -235,7 +246,7 @@ void loop() {
 
   // Serial.print("Current time: ");
   // Serial.println(timeClient.getFormattedTime());
-
+  serverHTTP.handleClient();
   server.handleClient();
   MDNS.update();
 }
