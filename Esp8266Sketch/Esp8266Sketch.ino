@@ -8,8 +8,9 @@
 #include <TOTP.h> // For Time-based One Time Passwords
 #include <unordered_map>
 
-// Import the html header file
+// Import the html files
 #include "index_html.h"
+#include "login_html.h"
 // Import the environment variables (ssid, password, static IP, default local gateway (get it from your router) & hmacKey)
 #include "envVariables.h"
 
@@ -81,24 +82,23 @@ String getPublicIp() {
   return String(); // Return an empty string after 3 failed attempts
 }
 
-// Set session username and password
-const char* http_username = "admin";
-const char* http_password = "admin";
-
-// std::unordered_map<std::string, std::string> credentials = {
-//         {"admin", "admin"},
-//         {"user", "user"},
-//     };
-
+// UserSession struct for the handling of session data
 struct UserSession
 {
+  const char* username;
+  const char* password;
   IPAddress ip;
   bool isLoggedIn;
   ;
 };
 
-UserSession userSessions[2];
+// Define an array that holds the sessions
+UserSession userSessions[2] = {
+    { "admin", "admin", IPAddress(0, 0, 0, 0), false },
+    { "user", "user", IPAddress(0, 0, 0, 0), false }
+};
 
+// Simple function to check if a client has already an active session using his ip
 bool is_authenticated(IPAddress ip)
 {
   Serial.println("Inside is authenticated");
@@ -127,8 +127,7 @@ void handleRoot()
 
   if (!is_authenticated(clientIP))
   {
-    // handleAuthentication(clientIP);
-    server.send(200, "text/plain", "not authenticated!");
+    server.send(200, "text/html", login_html);
   }
 
   server.send(200, "text/plain", "Welcome to the protected page!");
@@ -136,12 +135,6 @@ void handleRoot()
 
 void setup()
 {
-  UserSession test;
-  IPAddress myip(192, 168, 1, 64);
-  test.ip = myip;
-  test.isLoggedIn = true;
-
-  userSessions[0] = test;
   // Start Serial for debugging
   Serial.begin(115200);
 
