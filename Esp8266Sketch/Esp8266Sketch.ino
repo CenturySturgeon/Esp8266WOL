@@ -103,10 +103,8 @@ UserSession userSessions[2] = {
 
 // Simple function to check if a client ip has already an active session
 bool is_authenticated(IPAddress ip) {
-  Serial.println("Inside is authenticated");
   for (int i = 0; i < 2; i++) {
     if (userSessions[i].ip == ip && userSessions[i].isLoggedIn) {
-      Serial.println("Found match");
       return true;
     }
   }
@@ -115,7 +113,6 @@ bool is_authenticated(IPAddress ip) {
 
 // Simple function that checks the provided credentials match with the credentials on the array
 bool credentialsMatch(String username, String password) {
-  Serial.println("Inside credentialsMatch");
   for (int i = 0; i < 2; i++) {
     if (userSessions[i].username == username && userSessions[i].password == password) {
       return true;
@@ -126,7 +123,6 @@ bool credentialsMatch(String username, String password) {
 
 // Assigns the ip a session to the provided user name
 void assignSession(String username, IPAddress ip) {
-  Serial.println("Inside assignSession");
   for (int i = 0; i < 2; i++) {
     if (userSessions[i].username == username) {
       userSessions[i].ip = ip;
@@ -136,15 +132,12 @@ void assignSession(String username, IPAddress ip) {
 }
 
 void handleAuthentication(String username, String password, IPAddress ip) {
-  Serial.println("Inside handleAuthentication");
   bool clientAuthenticated = is_authenticated(ip);
   bool goodCredentials = credentialsMatch(username, password);
 
   if (clientAuthenticated) {
-    Serial.println("Inside handleAuthentication");
     server.send(200, "text/plain", "Welcome to the protected page!");
   } else {
-    Serial.println("Client was not auth");
     if (goodCredentials) {
       assignSession(username, ip);
       server.send(200, "text/plain", "Welcome to the protected page!");
@@ -155,10 +148,9 @@ void handleAuthentication(String username, String password, IPAddress ip) {
 
 }
 
+// Handles the initial GET request to the root path "/"
 void handleRoot() {
-  Serial.println("Inside handleRoot");
   IPAddress clientIP = server.client().remoteIP(); // Get the client's IP address
-  Serial.println(clientIP);
 
   if (!is_authenticated(clientIP)) {
     server.send(200, "text/html", login_html);
@@ -167,6 +159,7 @@ void handleRoot() {
   }
 
 }
+
 // Redirects incoming HTTP trafic to the HTTPS server
 void secureRedirect() {
   serverHTTP.sendHeader("Location", String("https://esp8266.local"), true);
@@ -206,11 +199,6 @@ void setup()
   // Cache SSL sessions to accelerate the TLS handshake.
   server.getServer().setCache(&serverCache);
 
-  // // Define the root path to serve the HTML file
-  // server.on("/", HTTP_GET, []() {
-  //   server.send(200, "text/html", index_html);
-  // });
-
   server.on("/", HTTP_GET, handleRoot);
 
   // Handle the login submission
@@ -220,7 +208,7 @@ void setup()
     String password = server.arg("password");
     IPAddress clientIP = server.client().remoteIP(); // Get the client's IP address
     handleAuthentication(username, password, clientIP);
-    });
+  });
 
   // Handle the form submission
   server.on("/submit", HTTP_POST, []() {
@@ -230,7 +218,7 @@ void setup()
     Serial.println(inputText);
     String newCode = String(totp.getCode(timeClient.getEpochTime()));
     server.send(200, "text/html", "You submitted: " + inputText + " The real code: " + newCode + " " + timeClient.getFormattedTime());
-    });
+  });
 
   // Redirect all users using HTTP to the HTTPS server
   serverHTTP.on("/", HTTP_GET, secureRedirect);
@@ -242,10 +230,6 @@ void setup()
 }
 
 void loop() {
-  // timeClient.update();
-
-  // Serial.print("Current time: ");
-  // Serial.println(timeClient.getFormattedTime());
   serverHTTP.handleClient();
   server.handleClient();
   MDNS.update();
