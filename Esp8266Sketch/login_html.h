@@ -49,6 +49,18 @@ const char* login_html = R"EOF(
             color: #fff;
             cursor: pointer;
         }
+        button[type="submit"] {
+            background-color: #4287f5;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer
+        }
+
+        button[type="submit"]:hover {
+            background-color: #285399
+        }
     </style>
 </head>
 <body>
