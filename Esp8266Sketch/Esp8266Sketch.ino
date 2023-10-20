@@ -141,20 +141,19 @@ void logout(IPAddress ip) {
   }
 }
 
-void handleAuthentication(String username, String password) {
+bool handleAuthentication(String username, String password) {
   IPAddress clientIp = server.client().remoteIP(); // Get the client's IP address
-  Serial.println(clientIp);
   bool clientAuthenticated = is_authenticated(clientIp);
   bool goodCredentials = credentialsMatch(username, password);
 
   if (clientAuthenticated) {
-    server.send(200, "text/plain", wol_html);
+    return true;
   } else {
     if (goodCredentials) {
       assignSession(username, clientIp);
-      server.send(200, "text/plain", wol_html);
+      return true;
     } else {
-      server.send(200, "text/html", login_html);
+      return false;
     }
   }
 }
@@ -163,6 +162,16 @@ void handleAuthentication(String username, String password) {
 void secureRedirect() {
   serverHTTP.sendHeader("Location", String("https://esp8266.local"), true);
   serverHTTP.send(301, "text/plain", "");
+}
+
+void loginRedirect() {
+  server.sendHeader("Location", "/login", true); // Redirect to the login path
+  server.send(301, "text/plain", "Redirecting to /login");
+}
+
+void wolRedirect() {
+  server.sendHeader("Location", "/wol", true); // Redirect to the wol path
+  server.send(301, "text/plain", "Redirecting to /wol");
 }
 
 void setup()
@@ -199,7 +208,27 @@ void setup()
   server.getServer().setCache(&serverCache);
 
   server.on("/", HTTP_GET, []() {
-    handleAuthentication("", "");
+    if (handleAuthentication("", "")) {
+      wolRedirect();
+    } else {
+      loginRedirect();
+    }
+  });
+
+  server.on("/wol", HTTP_GET, []() {
+    if (handleAuthentication("", "")) {
+      wolRedirect();
+    } else {
+      loginRedirect();
+    }
+  });
+
+  server.on("/login", HTTP_GET, []() {
+    if (handleAuthentication("", "")) {
+      wolRedirect();
+    } else {
+      server.send(200, "text/html", login_html);
+    }
   });
 
   // Handle the login submission
@@ -207,10 +236,14 @@ void setup()
     timeClient.update();
     String username = server.arg("username");
     String password = server.arg("password");
-    handleAuthentication(username, password);
+    if (handleAuthentication(username, password)) {
+      wolRedirect();
+    } else {
+      server.send(200, "text/html", login_html);
+    }
   });
 
-  // Handle the form submission
+  // Handle the WOL form submission
   server.on("/wol", HTTP_POST, []() {
     timeClient.update();
     String macAddress = server.arg("macAddress");
