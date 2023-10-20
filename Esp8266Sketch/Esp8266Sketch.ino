@@ -131,33 +131,22 @@ void assignSession(String username, IPAddress ip) {
   }
 }
 
-void handleAuthentication(String username, String password, IPAddress ip) {
-  bool clientAuthenticated = is_authenticated(ip);
+void handleAuthentication(String username, String password) {
+  IPAddress clientIp = server.client().remoteIP(); // Get the client's IP address
+  Serial.println(clientIp);
+  bool clientAuthenticated = is_authenticated(clientIp);
   bool goodCredentials = credentialsMatch(username, password);
 
   if (clientAuthenticated) {
     server.send(200, "text/plain", "Welcome to the protected page!");
   } else {
     if (goodCredentials) {
-      assignSession(username, ip);
+      assignSession(username, clientIp);
       server.send(200, "text/plain", "Welcome to the protected page!");
     } else {
-      server.send(200, "text/plain", "Bad Authentication!");
+      server.send(200, "text/html", login_html);
     }
   }
-
-}
-
-// Handles the initial GET request to the root path "/"
-void handleRoot() {
-  IPAddress clientIP = server.client().remoteIP(); // Get the client's IP address
-
-  if (!is_authenticated(clientIP)) {
-    server.send(200, "text/html", login_html);
-  } else {
-    server.send(200, "text/plain", "Welcome to the protected page!");
-  }
-
 }
 
 // Redirects incoming HTTP trafic to the HTTPS server
@@ -199,15 +188,16 @@ void setup()
   // Cache SSL sessions to accelerate the TLS handshake.
   server.getServer().setCache(&serverCache);
 
-  server.on("/", HTTP_GET, handleRoot);
+  server.on("/", HTTP_GET, []() {
+    handleAuthentication("", "");
+  });
 
   // Handle the login submission
   server.on("/login", HTTP_POST, []() {
     timeClient.update();
     String username = server.arg("username");
     String password = server.arg("password");
-    IPAddress clientIP = server.client().remoteIP(); // Get the client's IP address
-    handleAuthentication(username, password, clientIP);
+    handleAuthentication(username, password);
   });
 
   // Handle the form submission
