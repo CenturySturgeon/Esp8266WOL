@@ -10,7 +10,7 @@ const char* login_html = R"EOF(
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #282c34;
             margin: 0;
             padding: 0;
             display: flex;
@@ -38,45 +38,39 @@ const char* login_html = R"EOF(
             text-align: left;
             margin: 5px;
         }
-        .input-group input {
+        .input {
             padding: 10px;
             margin: 5px 0;
             border: 1px solid #ccc;
             border-radius: 3px;
+            text-align: center;
         }
-        .input-group input[type="submit"] {
+
+        .input-group button[type="submit"] {
             background: #333;
             color: #fff;
             cursor: pointer;
+            width: 100%;
         }
-        button[type="submit"] {
-            background-color: #4287f5;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer
-        }
-
-        button[type="submit"]:hover {
-            background-color: #285399
+        .input-group button[type="submit"]:hover {
+            background: #555;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>Login</h2>
-        <form action="login" method="POST">
+        <form action="wol" method="POST">
             <div class="input-group">
                 <label for="username">Username</label>
-                <input type="text" id="username" name="username" required>
+                <input class="input" type="text" id="username" name="username" required>
             </div>
             <div class="input-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
+                <input class="input" type="password" id="password" name="password" required>
             </div>
             <div class="input-group">
-                <button type="submit">SUBMIT</button>
+                <button class="input" type="submit">SUBMIT</button>
             </div>
         </form>
     </div>

@@ -70,7 +70,7 @@ const char *wol_html = R"EOF(
             </div>
             <div class="input-group">
                 <label for="pin">Enter your PIN</label>
-                <input class="input" type="text" id="pin" name="pin">
+                <input class="input" type="password" id="pin" name="pin" required>
             </div>
             <div class="input-group">
                 <button class="input" type="submit">WAKE UP</button>
