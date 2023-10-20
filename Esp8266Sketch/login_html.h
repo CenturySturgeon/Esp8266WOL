@@ -60,7 +60,7 @@ const char* login_html = R"EOF(
 <body>
     <div class="container">
         <h2>Login</h2>
-        <form action="wol" method="POST">
+        <form action="login" method="POST">
             <div class="input-group">
                 <label for="username">Username</label>
                 <input class="input" type="text" id="username" name="username" required>
