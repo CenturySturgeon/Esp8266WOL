@@ -138,11 +138,11 @@ void handleAuthentication(String username, String password) {
   bool goodCredentials = credentialsMatch(username, password);
 
   if (clientAuthenticated) {
-    server.send(200, "text/plain", "Welcome to the protected page!");
+    server.send(200, "text/plain", wol_html);
   } else {
     if (goodCredentials) {
       assignSession(username, clientIp);
-      server.send(200, "text/plain", "Welcome to the protected page!");
+      server.send(200, "text/plain", wol_html);
     } else {
       server.send(200, "text/html", login_html);
     }
@@ -201,13 +201,15 @@ void setup()
   });
 
   // Handle the form submission
-  server.on("/submit", HTTP_POST, []() {
+  server.on("/wol", HTTP_POST, []() {
     timeClient.update();
-    String inputText = server.arg("inputText");
-    Serial.print("Submitted Text: ");
-    Serial.println(inputText);
+    String macAddress = server.arg("macAddress");
+    String broadcastAddress = server.arg("broadcastAddress");
+    String pin = server.arg("pin");
+    Serial.print("Submitted Pin: ");
+    Serial.println(pin);
     String newCode = String(totp.getCode(timeClient.getEpochTime()));
-    server.send(200, "text/html", "You submitted: " + inputText + " The real code: " + newCode + " " + timeClient.getFormattedTime());
+    server.send(200, "text/html", "You submitted: " + pin + " The real code: " + newCode + " " + timeClient.getFormattedTime());
   });
 
   // Redirect all users using HTTP to the HTTPS server
