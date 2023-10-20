@@ -141,6 +141,7 @@ void logout(IPAddress ip) {
   }
 }
 
+// Returns wether or not there's an existing session for the given ip, and also has the ability to create a new session
 bool handleAuthentication(String username, String password) {
   IPAddress clientIp = server.client().remoteIP(); // Get the client's IP address
   bool clientAuthenticated = is_authenticated(clientIp);
@@ -164,14 +165,9 @@ void secureRedirect() {
   serverHTTP.send(301, "text/plain", "");
 }
 
-void loginRedirect() {
-  server.sendHeader("Location", "/login", true); // Redirect to the login path
-  server.send(301, "text/plain", "Redirecting to /login");
-}
-
-void wolRedirect() {
-  server.sendHeader("Location", "/wol", true); // Redirect to the wol path
-  server.send(301, "text/plain", "Redirecting to /wol");
+void redirectTo(String path) {
+  server.sendHeader("Location", path, true); // Redirect to the login path
+  server.send(301, "text/plain", "Redirecting to " + path);
 }
 
 void setup()
@@ -209,23 +205,23 @@ void setup()
 
   server.on("/", HTTP_GET, []() {
     if (handleAuthentication("", "")) {
-      wolRedirect();
+      redirectTo("/wol");
     } else {
-      loginRedirect();
+      redirectTo("/login");
     }
   });
 
   server.on("/wol", HTTP_GET, []() {
     if (handleAuthentication("", "")) {
-      wolRedirect();
+      redirectTo("/wol");
     } else {
-      loginRedirect();
+      redirectTo("/login");
     }
   });
 
   server.on("/login", HTTP_GET, []() {
     if (handleAuthentication("", "")) {
-      wolRedirect();
+      redirectTo("/wol");
     } else {
       server.send(200, "text/html", login_html);
     }
@@ -237,7 +233,7 @@ void setup()
     String username = server.arg("username");
     String password = server.arg("password");
     if (handleAuthentication(username, password)) {
-      wolRedirect();
+      redirectTo("/wol");
     } else {
       server.send(200, "text/html", login_html);
     }
