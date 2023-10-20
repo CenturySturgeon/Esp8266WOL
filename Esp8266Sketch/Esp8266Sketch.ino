@@ -8,7 +8,7 @@
 #include <TOTP.h> // For Time-based One Time Passwords
 
 // Import the html files
-#include "index_html.h"
+#include "wol_html.h"
 #include "login_html.h"
 // Import the environment variables (ssid, password, static IP, default local gateway (get it from your router) & hmacKey)
 #include "envVariables.h"
