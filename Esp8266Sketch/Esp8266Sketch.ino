@@ -242,19 +242,23 @@ void setup()
   // Handle the WOL form submission
   server.on("/wol", HTTP_POST, []() {
     timeClient.update();
-    String macAddress = server.arg("macAddress");
-    String broadcastAddress = server.arg("broadcastAddress");
-    String pin = server.arg("pin");
-    Serial.print("Submitted Pin: ");
-    Serial.println(pin);
-    String newCode = String(totp.getCode(timeClient.getEpochTime()));
-    if (newCode == pin) {
-      // Send magic packet to the equipment
-      server.send(200, "text/html", "Magic Packet sent to equipment: " + macAddress);
-      logout(server.client().remoteIP());
+    if (handleAuthentication("", "")){
+      String macAddress = server.arg("macAddress");
+      String broadcastAddress = server.arg("broadcastAddress");
+      String pin = server.arg("pin");
+      Serial.print("Submitted Pin: ");
+      Serial.println(pin);
+      String newCode = String(totp.getCode(timeClient.getEpochTime()));
+      if (newCode == pin) {
+        // Send magic packet to the equipment
+        server.send(200, "text/html", "Magic Packet sent to equipment: " + macAddress);
+        logout(server.client().remoteIP());
+      } else {
+        server.send(200, "text/html", "Wrong PIN; login out!");
+        logout(server.client().remoteIP()); 
+      }
     } else {
-      server.send(200, "text/html", "Wrong PIN; login out!");
-      logout(server.client().remoteIP()); 
+      server.send(405, "text/html", "Not Allowed")
     }
   });
 
