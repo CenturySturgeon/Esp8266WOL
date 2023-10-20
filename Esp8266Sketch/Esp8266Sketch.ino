@@ -131,6 +131,16 @@ void assignSession(String username, IPAddress ip) {
   }
 }
 
+// Handles the logout of a session for an ip
+void logout(IPAddress ip) {
+  for (int i = 0; i < 2; i++) {
+    if (userSessions[i].ip == ip) {
+      userSessions[i].ip = IPAddress(127, 0, 0, 1);
+      userSessions[i].isLoggedIn = false;
+    }
+  }
+}
+
 void handleAuthentication(String username, String password) {
   IPAddress clientIp = server.client().remoteIP(); // Get the client's IP address
   Serial.println(clientIp);
@@ -209,7 +219,14 @@ void setup()
     Serial.print("Submitted Pin: ");
     Serial.println(pin);
     String newCode = String(totp.getCode(timeClient.getEpochTime()));
-    server.send(200, "text/html", "You submitted: " + pin + " The real code: " + newCode + " " + timeClient.getFormattedTime());
+    if (newCode == pin) {
+      // Send magic packet to the equipment
+      server.send(200, "text/html", "Magic Packet sent to equipment: " + macAddress);
+      logout(server.client().remoteIP());
+    } else {
+      server.send(200, "text/html", "Wrong PIN; login out!");
+      logout(server.client().remoteIP()); 
+    }
   });
 
   // Redirect all users using HTTP to the HTTPS server
