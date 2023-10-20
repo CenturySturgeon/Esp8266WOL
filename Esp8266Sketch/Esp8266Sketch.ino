@@ -91,14 +91,18 @@ struct UserSession
   String password;
   IPAddress ip;
   bool isLoggedIn;
-  ;
+  unsigned long sessionStart;  // Time of the session begining in milliseconds
+  unsigned long lifeTime;      // Maximum session lifetime in seconds
 };
+
+// Maximum lifetime for the sessions in seconds
+unsigned long maxSessionLifeTime = 60;
 
 // User session array for the handling of session states (default should always have no session)
 UserSession userSessions[2] = {
     // 127.0.0.1 corresponds to the loopback address (localhost) and is not routable on the public internet
-    { "admin", "admin", IPAddress(127, 0, 0, 1), false },
-    { "user", "user", IPAddress(127, 0, 0, 1), false }
+    { "admin", "admin", IPAddress(127, 0, 0, 1), false, 0, maxSessionLifeTime},
+    { "user", "user", IPAddress(127, 0, 0, 1), false, 0, maxSessionLifeTime}
 };
 
 // Simple function to check if a client ip has already an active session
@@ -127,6 +131,7 @@ void assignSession(String username, IPAddress ip) {
     if (userSessions[i].username == username) {
       userSessions[i].ip = ip;
       userSessions[i].isLoggedIn = true;
+      userSessions[i].sessionStart = millis();
     }
   }
 }
@@ -137,6 +142,7 @@ void logout(IPAddress ip) {
     if (userSessions[i].ip == ip) {
       userSessions[i].ip = IPAddress(127, 0, 0, 1);
       userSessions[i].isLoggedIn = false;
+      userSessions[i].sessionStart = 0;
     }
   }
 }
@@ -213,7 +219,7 @@ void setup()
 
   server.on("/wol", HTTP_GET, []() {
     if (handleAuthentication("", "")) {
-      redirectTo("/wol");
+      server.send(200, "text/html", wol_html);
     } else {
       redirectTo("/login");
     }
@@ -258,7 +264,7 @@ void setup()
         logout(server.client().remoteIP()); 
       }
     } else {
-      server.send(405, "text/html", "Not Allowed")
+      server.send(405, "text/html", "Not Allowed");
     }
   });
 
@@ -271,8 +277,23 @@ void setup()
   String publicIP = getPublicIp();
 }
 
+void checkSessionTimeouts () {
+  unsigned long currentTime = millis();
+
+  for (int i = 0; i < sizeof(userSessions) / sizeof(userSessions[0]); i++) {
+    UserSession& session = userSessions[i];
+
+    if (session.isLoggedIn && currentTime - session.sessionStart > session.lifeTime * 1000) {
+      // Session has exceeded its lifetime: log out
+      logout(session.ip);
+    }
+  }
+}
+
 void loop() {
   serverHTTP.handleClient();
   server.handleClient();
   MDNS.update();
+  // Routinely check for session timeouts
+  checkSessionTimeouts();
 }
