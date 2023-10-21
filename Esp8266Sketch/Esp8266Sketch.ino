@@ -91,9 +91,7 @@ String getPublicIp() {
 // UserSession struct for the handling of session data
 struct UserSession
 {
-  String username;
-  String password;
-  String credentials;
+  String credentials;          // Hash that holds the session credentials (a mix of your username and password)
   IPAddress ip;
   bool isLoggedIn;
   unsigned long sessionStart;  // Time of the session begining in milliseconds
@@ -106,8 +104,10 @@ unsigned long maxSessionLifeTime = 60;
 // User session array for the handling of session states (default should always have no session)
 UserSession userSessions[2] = {
     // 127.0.0.1 corresponds to the loopback address (localhost) and is not routable on the public internet
-    { "admin", "admin", "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918", IPAddress(127, 0, 0, 1), false, 0, maxSessionLifeTime},
-    { "user", "user", "04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb", IPAddress(127, 0, 0, 1), false, 0, maxSessionLifeTime}
+    // Hash is admin:admin
+    { "8da193366e1554c08b2870c50f737b9587c3372b656151c4a96028af26f51334", IPAddress(127, 0, 0, 1), false, 0, maxSessionLifeTime},
+    // Hash is user:user
+    { "dc05eb46a46f4645f14bff72c8dfe95e0ba1b1d3d72e189ac2c977a44b7dcaf8", IPAddress(127, 0, 0, 1), false, 0, maxSessionLifeTime}
 };
 
 // Simple function to check if a client ip has already an active session
@@ -131,9 +131,9 @@ bool credentialsMatch(String credentials) {
 }
 
 // Assigns the ip a session to the provided user name
-void assignSession(String username, IPAddress ip) {
+void assignSession(String credentials, IPAddress ip) {
   for (int i = 0; i < 2; i++) {
-    if (userSessions[i].username == username) {
+    if (userSessions[i].credentials == credentials) {
       userSessions[i].ip = ip;
       userSessions[i].isLoggedIn = true;
       userSessions[i].sessionStart = millis();
@@ -153,7 +153,7 @@ void logout(IPAddress ip) {
 }
 
 // Returns wether or not there's an existing session for the given ip, and also has the ability to create a new session
-bool handleAuthentication(String username, String credentials) {
+bool handleAuthentication(String credentials) {
   IPAddress clientIp = server.client().remoteIP(); // Get the client's IP address
   bool clientAuthenticated = is_authenticated(clientIp);
   bool goodCredentials = credentialsMatch(credentials);
@@ -162,7 +162,7 @@ bool handleAuthentication(String username, String credentials) {
     return true;
   } else {
     if (goodCredentials) {
-      assignSession(username, clientIp);
+      assignSession(credentials, clientIp);
       return true;
     } else {
       return false;
@@ -236,7 +236,7 @@ void setup()
   server.getServer().setCache(&serverCache);
 
   server.on("/", HTTP_GET, []() {
-    if (handleAuthentication("", "")) {
+    if (handleAuthentication("")) {
       redirectTo("/wol");
     } else {
       redirectTo("/login");
@@ -244,7 +244,7 @@ void setup()
   });
 
   server.on("/wol", HTTP_GET, []() {
-    if (handleAuthentication("", "")) {
+    if (handleAuthentication("")) {
       server.send(200, "text/html", wol_html);
     } else {
       redirectTo("/login");
@@ -252,7 +252,7 @@ void setup()
   });
 
   server.on("/login", HTTP_GET, []() {
-    if (handleAuthentication("", "")) {
+    if (handleAuthentication("")) {
       redirectTo("/wol");
     } else {
       server.send(200, "text/html", login_html);
@@ -264,8 +264,9 @@ void setup()
     timeClient.update();
     String username = server.arg("username");
     String password = server.arg("password");
-    String credentials = calculateSHA256Hash(password);
-    if (handleAuthentication(username, credentials)) {
+    // Use a mix of the username and the password to create the credentials
+    String credentials = calculateSHA256Hash(username + ":" + password);
+    if (handleAuthentication(credentials)) {
       redirectTo("/wol");
     } else {
       server.send(200, "text/html", login_html);
@@ -275,7 +276,7 @@ void setup()
   // Handle the WOL form submission
   server.on("/wol", HTTP_POST, []() {
     timeClient.update();
-    if (handleAuthentication("", "")){
+    if (handleAuthentication("")){
       String macAddress = server.arg("macAddress");
       String broadcastAddress = server.arg("broadcastAddress");
       String pin = server.arg("pin");
