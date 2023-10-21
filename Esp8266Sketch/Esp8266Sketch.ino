@@ -10,6 +10,8 @@
 // Importing Rhys Weatherly's cryptography library to use SHA256 encryption
 #include <Crypto.h> 
 #include <SHA256.h>
+// Importing a7md0's WakeOnLan library
+#include <WakeOnLan.h>
 
 // Import the html files
 #include "wol_html.h"
@@ -33,6 +35,7 @@ ESP8266WebServer serverHTTP(80);
 
 WiFiUDP udp;
 NTPClient timeClient(udp, ntpServerName, timeZone);
+WakeOnLan WOL(udp); // Pass WiFiUDP class
 
 // Set the TOTP key to be used for code generation
 TOTP totp = TOTP(hmacKey, 10);
@@ -225,6 +228,9 @@ void setup()
   // Initialize the time client
   timeClient.begin();
   timeClient.update();
+
+  WOL.setRepeat(3, 100); // Repeat the packet three times with 100ms delay between
+  WOL.calculateBroadcastAddress(WiFi.localIP(), WiFi.subnetMask()); // Calculate and set broadcast address
 
   if (MDNS.begin("esp8266")){
     Serial.println("MDNS responder started");
