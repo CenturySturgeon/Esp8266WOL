@@ -120,10 +120,10 @@ bool is_authenticated(IPAddress ip) {
   return false;
 }
 
-// Simple function that checks the provided credentials match with the credentials on the array
-bool credentialsMatch(String username, String password) {
+// Simple function that checks the provided credentials match with the credentials on the sessions array
+bool credentialsMatch(String credentials) {
   for (int i = 0; i < 2; i++) {
-    if (userSessions[i].username == username && userSessions[i].password == password) {
+    if (userSessions[i].credentials == credentials) {
       return true;
     }
   }
@@ -153,10 +153,10 @@ void logout(IPAddress ip) {
 }
 
 // Returns wether or not there's an existing session for the given ip, and also has the ability to create a new session
-bool handleAuthentication(String username, String password) {
+bool handleAuthentication(String username, String credentials) {
   IPAddress clientIp = server.client().remoteIP(); // Get the client's IP address
   bool clientAuthenticated = is_authenticated(clientIp);
-  bool goodCredentials = credentialsMatch(username, password);
+  bool goodCredentials = credentialsMatch(credentials);
 
   if (clientAuthenticated) {
     return true;
@@ -182,11 +182,15 @@ void redirectTo(String path) {
 }
 
 // Function that returns the SHA256 hash for the provided string
-String calculateSHA256Hash(const char *inputString) {
+String calculateSHA256Hash(const String& inputString) {
   SHA256 sha256;
   byte hash[32];
   sha256.reset();
-  sha256.update(inputString, strlen(inputString));
+  
+  // Convert the String to a char* using c_str()
+  const char* charArray = inputString.c_str();
+
+  sha256.update(charArray, strlen(charArray));
   sha256.finalize(hash, 32);
 
   char hashHex[65]; // Each byte corresponds to 2 hexadecimal characters, plus a null terminator
@@ -260,7 +264,8 @@ void setup()
     timeClient.update();
     String username = server.arg("username");
     String password = server.arg("password");
-    if (handleAuthentication(username, password)) {
+    String credentials = calculateSHA256Hash(password);
+    if (handleAuthentication(username, credentials)) {
       redirectTo("/wol");
     } else {
       server.send(200, "text/html", login_html);
@@ -297,18 +302,6 @@ void setup()
   serverHTTP.begin();
 
   String publicIP = getPublicIp();
-
-  const char *inputString = "admin";
-  String hashHex = calculateSHA256Hash(inputString);
-
-  Serial.print("SHA-256 Hash of 'admin': ");
-  Serial.println(hashHex);
-  String compare = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
-  if (hashHex.equals(compare)){
-    Serial.println("EVERY DAY I SEE MY DREAM");
-  } else {
-    Serial.println(":(");
-  }
 }
 
 void checkSessionTimeouts () {
