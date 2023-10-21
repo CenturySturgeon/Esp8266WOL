@@ -7,6 +7,10 @@
 #include <ESP8266mDNS.h>
 #include <TOTP.h> // For Time-based One Time Passwords
 
+// Importing Rhys Weatherly's cryptography library to use SHA256 encryption
+#include <Crypto.h> 
+#include <SHA256.h>
+
 // Import the html files
 #include "wol_html.h"
 #include "login_html.h"
@@ -176,6 +180,22 @@ void redirectTo(String path) {
   server.send(301, "text/plain", "Redirecting to " + path);
 }
 
+String calculateSHA256Hash(const char *inputString) {
+  SHA256 sha256;
+  byte hash[32];
+  sha256.reset();
+  sha256.update(inputString, strlen(inputString));
+  sha256.finalize(hash, 32);
+
+  char hashHex[65]; // Each byte corresponds to 2 hexadecimal characters, plus a null terminator
+  for (int i = 0; i < 32; i++) {
+      sprintf(hashHex + 2 * i, "%02x", hash[i]);
+  }
+  hashHex[64] = '\0';
+
+  return String(hashHex);
+}
+
 void setup()
 {
   // Start Serial for debugging
@@ -275,6 +295,18 @@ void setup()
   serverHTTP.begin();
 
   String publicIP = getPublicIp();
+
+  const char *inputString = "admin";
+  String hashHex = calculateSHA256Hash(inputString);
+
+  Serial.print("SHA-256 Hash of 'admin': ");
+  Serial.println(hashHex);
+  String compare = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
+  if (hashHex.equals(compare)){
+    Serial.println("EVERY DAY I SEE MY DREAM");
+  } else {
+    Serial.println(":(");
+  }
 }
 
 void checkSessionTimeouts () {
