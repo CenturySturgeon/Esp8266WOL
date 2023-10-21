@@ -93,6 +93,7 @@ struct UserSession
 {
   String username;
   String password;
+  String credentials;
   IPAddress ip;
   bool isLoggedIn;
   unsigned long sessionStart;  // Time of the session begining in milliseconds
@@ -105,8 +106,8 @@ unsigned long maxSessionLifeTime = 60;
 // User session array for the handling of session states (default should always have no session)
 UserSession userSessions[2] = {
     // 127.0.0.1 corresponds to the loopback address (localhost) and is not routable on the public internet
-    { "admin", "admin", IPAddress(127, 0, 0, 1), false, 0, maxSessionLifeTime},
-    { "user", "user", IPAddress(127, 0, 0, 1), false, 0, maxSessionLifeTime}
+    { "admin", "admin", "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918", IPAddress(127, 0, 0, 1), false, 0, maxSessionLifeTime},
+    { "user", "user", "04f8996da763b7a969b1028ee3007569eaf3a635486ddab211d512c85b9df8fb", IPAddress(127, 0, 0, 1), false, 0, maxSessionLifeTime}
 };
 
 // Simple function to check if a client ip has already an active session
@@ -180,6 +181,7 @@ void redirectTo(String path) {
   server.send(301, "text/plain", "Redirecting to " + path);
 }
 
+// Function that returns the SHA256 hash for the provided string
 String calculateSHA256Hash(const char *inputString) {
   SHA256 sha256;
   byte hash[32];

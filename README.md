@@ -106,3 +106,7 @@ Once you run these commands you can get the certificate and key from the .txt fi
     CN - Common name (domain name)
 
 The subjectAltName parameter must contain the domain name(s) where your server is accessible. It can specify also IP addresses like this: 'subjectAltName=DNS:esp8266.local,IP:192.168.7.77'.
+
+### NOTES
+
+To enhance security and prevent the storage of session credentials in plain text, the Crypto library is utilized to securely store them as SHA-256 encrypted hashes. You can install this library directly from the Arduino IDE, it's the one from Rhys Weatherly, more of this in the github repo https://github.com/rweather/arduinolibs. To generate your hashes, you can use online tools like this one https://emn178.github.io/online-tools/sha256.html.
