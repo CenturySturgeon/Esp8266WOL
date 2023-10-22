@@ -284,12 +284,14 @@ void setup()
   server.on("/wol", HTTP_POST, []() {
     timeClient.update();
     if (handleAuthentication("")){
-      String macAddress = server.arg("macAddress");
+      const char *macAddress = server.arg("macAddress");
+      const char *secureOn = server.arg("secureOn") 
       String broadcastAddress = server.arg("broadcastAddress");
       String pin = server.arg("pin");
-      Serial.print("Submitted Pin: ");
-      Serial.println(pin);
+
+      // Get a new TOTP code for comparisson
       String newCode = String(totp.getCode(timeClient.getEpochTime()));
+
       if (newCode == pin) {
         // Send magic packet to the equipment
         server.send(200, "text/html", "Magic Packet sent to equipment: " + macAddress);
