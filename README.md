@@ -110,3 +110,5 @@ The subjectAltName parameter must contain the domain name(s) where your server i
 ### NOTES
 
 To enhance security and prevent the storage of session credentials in plain text, the Crypto library is utilized to securely store them as SHA-256 encrypted hashes. You can install this library directly from the Arduino IDE, it's the one from Rhys Weatherly, more of this in the github repo https://github.com/rweather/arduinolibs. To generate your hashes, you can use online tools like this one https://emn178.github.io/online-tools/sha256.html.
+
+You can read more about the WOL library used in this code at https://github.com/a7md0/WakeOnLan.

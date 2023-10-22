@@ -295,7 +295,7 @@ void setup()
         server.send(200, "text/html", "Magic Packet sent to equipment: " + macAddress);
         logout(server.client().remoteIP());
       } else {
-        server.send(200, "text/html", "Wrong PIN; login out!");
+        server.send(405, "text/html", "Wrong PIN; login out!");
         logout(server.client().remoteIP()); 
       }
     } else {

@@ -65,6 +65,10 @@ const char *wol_html = R"EOF(
                 <input class="input" type="text" id="macAddress" name="macAddress" required placeholder="XX:XX:XX:XX:XX:XX">
             </div>
             <div class="input-group">
+                <label for="secureOn">SecureOn (Optional)</label>
+                <input class="input" type="text" id="secureOn" name="secureOn" placeholder="XX:XX:XX:XX:XX:XX">
+            </div>
+            <div class="input-group">
                 <label for="broadcastAddress">Broadcast IP (Optional)</label>
                 <input class="input" type="text" id="broadcastAddress" name="broadcastAddress" placeholder="192.168.1.255">
             </div>
