@@ -34,7 +34,6 @@ BearSSL::ServerSessions serverCache(5);
 ESP8266WebServer serverHTTP(80);
 
 WiFiUDP udp;
-NTPClient timeClient(udp, ntpServerName, timeZone);
 WakeOnLan WOL(udp); // Pass WiFiUDP class
 
 // Set the TOTP key to be used for code generation
@@ -225,10 +224,6 @@ void setup()
   Serial.println("Connected to WiFi with IP: ");
   Serial.println(WiFi.localIP());
 
-  // Initialize the time client
-  timeClient.begin();
-  timeClient.update();
-
   WOL.setRepeat(3, 100); // Repeat the packet three times with 100ms delay between
   WOL.calculateBroadcastAddress(WiFi.localIP(), WiFi.subnetMask()); // Calculate and set broadcast address
 
@@ -268,7 +263,6 @@ void setup()
 
   // Handle the login submission
   server.on("/login", HTTP_POST, []() {
-    timeClient.update();
     String username = server.arg("username").substring(0, 16);
     String password = server.arg("password").substring(0, 16);
     // Use a mix of the username and the password to create the credentials
@@ -282,14 +276,13 @@ void setup()
 
   // Handle the WOL form submission
   server.on("/wol", HTTP_POST, []() {
-    timeClient.update();
     String macAddress = server.arg("macAddress").substring(0, 17);
     String secureOn = server.arg("secureOn").substring(0, 17);
     String broadcastAddress = server.arg("broadcastAddress").substring(0, 17);
     String pin = server.arg("pin").substring(0, 6);
 
-    // Check if authenticated and TOTP PIN match
-    if (handleAuthentication("") && String(totp.getCode(timeClient.getEpochTime())) == pin){
+    // Check if authenticated and TOTP PIN match using current time (time(nullptr))
+    if (handleAuthentication("") && String(totp.getCode(time(nullptr))) == pin){
 
       // Send magic packet to the equipment
       if (secureOn != "") {
@@ -311,6 +304,17 @@ void setup()
 
   // Redirect all users using HTTP to the HTTPS server
   serverHTTP.on("/", HTTP_GET, secureRedirect);
+
+  // Synchronizes the time to an NTP server, after that, you can access the epoch time (# of seconds since Jan 1 1970) with time(nullptr)
+  Serial.print("Synching time: ");
+  configTime(0, 0, "pool.ntp.org"); // get UTC time via NTP
+  while (time(nullptr) < 24 * 3600)
+  {
+    Serial.print(".");
+    delay(100);
+  }
+
+  Serial.println("Time synched with NTP server on UTC 0");
 
   server.begin();
   serverHTTP.begin();
