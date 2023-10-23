@@ -283,24 +283,26 @@ void setup()
   // Handle the WOL form submission
   server.on("/wol", HTTP_POST, []() {
     timeClient.update();
-    if (handleAuthentication("")){
-      const char *macAddress = server.arg("macAddress");
-      const char *secureOn = server.arg("secureOn") 
-      String broadcastAddress = server.arg("broadcastAddress");
-      String pin = server.arg("pin");
+    const char *macAddress = server.arg("macAddress");
+    const char *secureOn = server.arg("secureOn") 
+    String broadcastAddress = server.arg("broadcastAddress");
+    String pin = server.arg("pin");
 
-      // Get a new TOTP code for comparisson
-      String newCode = String(totp.getCode(timeClient.getEpochTime()));
+    // Check if authenticated and TOTP PIN match
+    if (handleAuthentication("") && String(totp.getCode(timeClient.getEpochTime())) == pin){
 
-      if (newCode == pin) {
-        // Send magic packet to the equipment
-        server.send(200, "text/html", "Magic Packet sent to equipment: " + macAddress);
-        logout(server.client().remoteIP());
+      // Send magic packet to the equipment
+      if (secureOn != "") {
+        WOL.sendSecureMagicPacket(macAddress, secureOn);
       } else {
-        server.send(405, "text/html", "Wrong PIN; login out!");
-        logout(server.client().remoteIP()); 
+        WOL.sendMagicPacket(macAddress);
       }
+      // Return success page and logout
+      server.send(200, "text/html", "Magic Packet sent to equipment: " + macAddress);
+      logout(server.client().remoteIP());
+      
     } else {
+      logout(server.client().remoteIP());
       server.send(405, "text/html", "Not Allowed");
     }
   });
