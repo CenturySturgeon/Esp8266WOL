@@ -283,19 +283,19 @@ void setup()
   // Handle the WOL form submission
   server.on("/wol", HTTP_POST, []() {
     timeClient.update();
-    const char *macAddress = server.arg("macAddress");
-    const char *secureOn = server.arg("secureOn") 
-    String broadcastAddress = server.arg("broadcastAddress");
-    String pin = server.arg("pin");
+    String macAddress = server.arg("macAddress").substring(0, 17);
+    String secureOn = server.arg("secureOn").substring(0, 17);
+    String broadcastAddress = server.arg("broadcastAddress").substring(0, 17);
+    String pin = server.arg("pin").substring(0, 6);
 
     // Check if authenticated and TOTP PIN match
     if (handleAuthentication("") && String(totp.getCode(timeClient.getEpochTime())) == pin){
 
       // Send magic packet to the equipment
       if (secureOn != "") {
-        WOL.sendSecureMagicPacket(macAddress, secureOn);
+        WOL.sendSecureMagicPacket(macAddress.c_str(), secureOn.c_str()); // Convert String to const char *
       } else {
-        WOL.sendMagicPacket(macAddress);
+        WOL.sendMagicPacket(macAddress.c_str()); // Convert String to const char *
       }
       // Return success page and logout
       server.send(200, "text/html", "Magic Packet sent to equipment: " + macAddress);
