@@ -269,8 +269,8 @@ void setup()
   // Handle the login submission
   server.on("/login", HTTP_POST, []() {
     timeClient.update();
-    String username = server.arg("username");
-    String password = server.arg("password");
+    String username = server.arg("username").substring(0, 16);
+    String password = server.arg("password").substring(0, 16);
     // Use a mix of the username and the password to create the credentials
     String credentials = calculateSHA256Hash(username + ":" + password);
     if (handleAuthentication(credentials)) {
@@ -293,8 +293,10 @@ void setup()
 
       // Send magic packet to the equipment
       if (secureOn != "") {
+        Serial.println("Sent SecureOn");
         WOL.sendSecureMagicPacket(macAddress.c_str(), secureOn.c_str()); // Convert String to const char *
       } else {
+        Serial.println("Sent MAC only");
         WOL.sendMagicPacket(macAddress.c_str()); // Convert String to const char *
       }
       // Return success page and logout

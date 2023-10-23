@@ -63,11 +63,11 @@ const char* login_html = R"EOF(
         <form action="login" method="POST">
             <div class="input-group">
                 <label for="username">Username</label>
-                <input class="input" type="text" id="username" name="username" required>
+                <input class="input" type="text" id="username" name="username" placeholder="Max 16 Characters" required>
             </div>
             <div class="input-group">
                 <label for="password">Password</label>
-                <input class="input" type="password" id="password" name="password" required>
+                <input class="input" type="password" id="password" name="password" placeholder="Max 16 Characters" required>
             </div>
             <div class="input-group">
                 <button class="input" type="submit">SUBMIT</button>
