@@ -5,15 +5,15 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266WebServerSecure.h>
 #include <ESP8266mDNS.h>
-#include <TOTP.h> // For Time-based One Time Passwords
+#include <TOTP.h>  // For Time-based One Time Passwords
 
 // Importing Rhys Weatherly's cryptography library to use SHA256 encryption
-#include <Crypto.h> 
+#include <Crypto.h>
 #include <SHA256.h>
 // Importing a7md0's WakeOnLan library
 #include <WakeOnLan.h>
 
-// Import the SecureServer 
+// Import the SecureServer
 #include "types.h"
 // Import the SetRoutes function alongside the calculateSHA256 function
 #include "routes.h"
@@ -23,11 +23,11 @@
 
 // Define NTP Server and Time Zone (remember, most authenticator apps will use the default values, UTC0, to avoid timezone issues)
 const char* ntpServerName = "pool.ntp.org";
-const int timeZone = 0;       // Change this to your time zone offset in seconds
-const int daylightOffset = 0; // x hour offset for Daylight Saving Time (DST)
+const int timeZone = 0;        // Change this to your time zone offset in seconds
+const int daylightOffset = 0;  // x hour offset for Daylight Saving Time (DST)
 
 IPAddress subnet(255, 255, 255, 0);
-IPAddress dns(1, 1, 1, 1); // Cloudflare DNS (can be another like google's or a local one of your choice)
+IPAddress dns(1, 1, 1, 1);  // Cloudflare DNS (can be another like google's or a local one of your choice)
 
 // Set the main webserver on port 443 (HTTPS)
 BearSSL::ServerSessions serverCache(5);
@@ -61,7 +61,7 @@ String getPublicIp() {
         if (millis() - timeout > 5000) {
           Serial.println("Client timeout");
           client.stop();
-          break; // Retry on timeout
+          break;  // Retry on timeout
         }
       }
 
@@ -74,7 +74,7 @@ String getPublicIp() {
       client.stop();
 
       if (publicIp.length() > 0) {
-        return publicIp; // Successfully obtained the IP
+        return publicIp;  // Successfully obtained the IP
       }
 
       Serial.println("IP not received on attempt " + String(attempt));
@@ -84,11 +84,11 @@ String getPublicIp() {
 
     if (attempt < 3) {
       Serial.println("Waiting 5 seconds before reattempt...");
-      delay(5000); // Wait 5 seconds before reattempt
+      delay(5000);  // Wait 5 seconds before reattempt
     }
   }
 
-  return String(); // Return an empty string after 3 failed attempts
+  return String();  // Return an empty string after 3 failed attempts
 }
 
 // Maximum lifetime for the sessions in seconds
@@ -96,11 +96,11 @@ unsigned long maxSessionLifeTime = 60;
 
 // User session array for the handling of session states (default should always have no session)
 UserSession userSessions[2] = {
-    // 127.0.0.1 corresponds to the loopback address (localhost) and is not routable on the public internet
-    // Hash is admin:admin
-    { "The Admin", "8da193366e1554c08b2870c50f737b9587c3372b656151c4a96028af26f51334", IPAddress(127, 0, 0, 1), false, 0, maxSessionLifeTime},
-    // Hash is user:user
-    { "The User", "dc05eb46a46f4645f14bff72c8dfe95e0ba1b1d3d72e189ac2c977a44b7dcaf8", IPAddress(127, 0, 0, 1), false, 0, maxSessionLifeTime}
+  // 127.0.0.1 corresponds to the loopback address (localhost) and is not routable on the public internet
+  // Hash is admin:admin
+  { "The Admin", "8da193366e1554c08b2870c50f737b9587c3372b656151c4a96028af26f51334", IPAddress(127, 0, 0, 1), false, 0, maxSessionLifeTime },
+  // Hash is user:user
+  { "The User", "dc05eb46a46f4645f14bff72c8dfe95e0ba1b1d3d72e189ac2c977a44b7dcaf8", IPAddress(127, 0, 0, 1), false, 0, maxSessionLifeTime }
 };
 
 // Create a new SecureServer instance
@@ -112,8 +112,7 @@ void secureRedirect() {
   serverHTTP.send(301, "text/plain", "");
 }
 
-void setup()
-{
+void setup() {
   // Start Serial for debugging
   Serial.begin(115200);
 
@@ -131,10 +130,10 @@ void setup()
   Serial.println("Connected to WiFi with IP: ");
   Serial.println(WiFi.localIP());
 
-  secureServer.WOL.setRepeat(3, 100); // Repeat the packet three times with 100ms delay between
-  secureServer.WOL.calculateBroadcastAddress(WiFi.localIP(), WiFi.subnetMask()); // Calculate and set broadcast address
+  secureServer.WOL.setRepeat(3, 100);                                             // Repeat the packet three times with 100ms delay between
+  secureServer.WOL.calculateBroadcastAddress(WiFi.localIP(), WiFi.subnetMask());  // Calculate and set broadcast address
 
-  if (MDNS.begin("esp8266")){
+  if (MDNS.begin("esp8266")) {
     Serial.println("MDNS responder started");
   }
 
@@ -145,15 +144,14 @@ void setup()
   secureServer.server.getServer().setCache(&serverCache);
 
   setServerRoutes(secureServer);
-  
+
   // Redirect all users using HTTP to the HTTPS server
   serverHTTP.on("/", HTTP_GET, secureRedirect);
 
   // Synchronizes the time to an NTP server, after that, you can access the epoch time (# of seconds since Jan 1 1970) with time(nullptr)
   Serial.print("Synching time: ");
-  configTime(0, 0, "pool.ntp.org"); // get UTC time via NTP
-  while (time(nullptr) < 24 * 3600)
-  {
+  configTime(0, 0, "pool.ntp.org");  // get UTC time via NTP
+  while (time(nullptr) < 24 * 3600) {
     Serial.print(".");
     delay(100);
   }
@@ -166,11 +164,11 @@ void setup()
   // String publicIP = getPublicIp();
 }
 
-void checkSessionTimeouts () {
+void checkSessionTimeouts() {
   unsigned long currentTime = millis();
 
   for (int i = 0; i < sizeof(secureServer.userSessions) / sizeof(secureServer.userSessions[0]); i++) {
-    UserSession &session = userSessions[i];
+    UserSession& session = userSessions[i];
 
     if (session.isLoggedIn && currentTime - session.sessionStart > session.lifeTime * 1000) {
       // Session has exceeded its lifetime: log out
