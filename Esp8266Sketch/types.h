@@ -2,6 +2,8 @@
 #include <WiFiUdp.h>
 #include <ESP8266WebServerSecure.h>
 
+// For Time-based One Time Passwords
+#include <TOTP.h>
 // Importing Rhys Weatherly's cryptography library to use SHA256 encryption
 #include <Crypto.h>
 #include <SHA256.h>
@@ -22,11 +24,12 @@ struct UserSession {
 struct SecureServer {
   BearSSL::ESP8266WebServerSecure server;
   UserSession userSessions[2];
+  TOTP totp;
   WakeOnLan WOL;
 
   // Constructor for SecureServer
-  SecureServer(int serverPort, UserSession *sessions, WiFiUDP &udp)
-    : server(serverPort), WOL(udp) {
+  SecureServer(int serverPort, UserSession *sessions, uint8_t *key, WiFiUDP &udp)
+    : server(serverPort), totp(key, 10), WOL(udp) {
     for (int i = 0; i < 2; i++) {
       userSessions[i] = sessions[i];
     }
