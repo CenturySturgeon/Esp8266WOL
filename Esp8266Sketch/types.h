@@ -1,9 +1,12 @@
 // types.h
+#include <WiFiUdp.h>
 #include <ESP8266WebServerSecure.h>
 
 // Importing Rhys Weatherly's cryptography library to use SHA256 encryption
 #include <Crypto.h>
 #include <SHA256.h>
+// Importing a7md0's WakeOnLan library
+#include <WakeOnLan.h>
 
 // UserSession struct for the handling of session data
 struct UserSession {
@@ -19,10 +22,11 @@ struct UserSession {
 struct SecureServer {
   BearSSL::ESP8266WebServerSecure server;
   UserSession userSessions[2];
+  WakeOnLan WOL;
 
   // Constructor for SecureServer
-  SecureServer(int serverPort, UserSession *sessions)
-    : server(serverPort) {
+  SecureServer(int serverPort, UserSession *sessions, WiFiUDP &udp)
+    : server(serverPort), WOL(udp) {
     for (int i = 0; i < 2; i++) {
       userSessions[i] = sessions[i];
     }
