@@ -126,7 +126,7 @@ void checkSessionTimeouts() {
   unsigned long currentTime = millis();
 
   for (int i = 0; i < sizeof(secureServer.userSessions) / sizeof(secureServer.userSessions[0]); i++) {
-    UserSession& session = userSessions[i];
+    UserSession& session = secureServer.userSessions[i];
 
     if (session.isLoggedIn && currentTime - session.sessionStart > session.lifeTime * 1000) {
       // Session has exceeded its lifetime: log out

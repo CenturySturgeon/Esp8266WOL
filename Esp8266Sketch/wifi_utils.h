@@ -30,7 +30,6 @@ String getPublicIp(X509List &publicIpSiteCert) {
 
       while (client.available()) {
         publicIp = client.readStringUntil('\n');
-        Serial.println(publicIp);
       }
 
       // Close the connection
