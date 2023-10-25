@@ -23,38 +23,14 @@ uint8_t hmacKey[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
 // Your certificate for ssl connection over HTTPS (DO NOT use this one)
 static const char serverCert[] PROGMEM = R"EOF(
 -----BEGIN CERTIFICATE-----
-MIICPjCCAacCFD+seHHSMYXsW9CK14lEbZRJBDeUMA0GCSqGSIb3DQEBCwUAMF4x
-CzAJBgNVBAYTAlhYMQswCQYDVQQIDAJYWDELMAkGA1UEBwwCWFgxEDAOBgNVBAoM
-B1hYIFtST10xCzAJBgNVBAsMAlhYMRYwFAYDVQQDDA1lc3A4MjY2LmxvY2FsMB4X
-DTIzMTAyMTAzMjQxNloXDTI0MTAyMDAzMjQxNlowXjELMAkGA1UEBhMCWFgxCzAJ
-BgNVBAgMAlhYMQswCQYDVQQHDAJYWDEQMA4GA1UECgwHWFggW1JPXTELMAkGA1UE
-CwwCWFgxFjAUBgNVBAMMDWVzcDgyNjYubG9jYWwwgZ8wDQYJKoZIhvcNAQEBBQAD
-gY0AMIGJAoGBAL84K7WGVrjY+qZRiGVfQ7N3U1WQtN3XV/0cAAoVfXaoUr/q2MV9
-plG401srgmSqMUYziMzm+S29KGX9XLLeXczIrwvdPW9vueplO/60VNjow3O1RXWh
-9iZexBS+gnzIlh7/vB+jILDmwf+OgwHwf8hnaSbK76KrZwiKjqBoSdxPAgMBAAEw
-DQYJKoZIhvcNAQELBQADgYEADoKvfFsmoN16W/1O+0hsn4OTTKQGolwInR+E3iWm
-WR+n/QzvJpwV3OJcIsiIiIyYpqRp43RuZd3by9jOkg4Lu7v8aq3PqKQlquzTIuWJ
-1JE7B++p0oXtX3oayhcAotBd/fRfr/AHwJx0pe9Czx4LABvRi5av5JIQ810X1c9o
-Dyk=
+    // YOUR CERT HERE //
 -----END CERTIFICATE-----
 )EOF";
 
 // Your private key for ssl connection over HTTPS (DO NOT use this one)
 static const char serverKey[] PROGMEM =  R"EOF(
 -----BEGIN RSA PRIVATE KEY-----
-MIICXAIBAAKBgQC/OCu1hla42PqmUYhlX0Ozd1NVkLTd11f9HAAKFX12qFK/6tjF
-faZRuNNbK4JkqjFGM4jM5vktvShl/Vyy3l3MyK8L3T1vb7nqZTv+tFTY6MNztUV1
-ofYmXsQUvoJ8yJYe/7wfoyCw5sH/joMB8H/IZ2kmyu+iq2cIio6gaEncTwIDAQAB
-AoGALNqzPhB2FUQof40OjqDrE5UBAkhAdO1HoYLI65Sg6o2PY59mG+VedzsAsRki
-rBRUHKCIDXB8sOL3L/1fmkGZBMGOZ44tJEVmYjweiXD8Sir5adBXNtBr4t1IVdkD
-FOK5NN5MAhCV6PyR0uC898aXyezynbsqEqEMade0K4diY9kCQQDk6ynLecv2ZERo
-s5W9m1nWGVP6oLGNjlnZl6jYCdn+5UzpsCrnwKpnEtjHVfZ0uAbByw77vAwgisSV
-Fc5kGuWtAkEA1ddIDoWiMwh8h6K2NNOWocRfNnjAJ+CXh2bR5Dlsp1F5jXsjoeFj
-wwfE3kJNN/HpgD166ZlfPLnQJ6mgDKTxawJBALC0qq2L1hrbKUddIQCc08sGACJe
-OtCXitoBTO9/I0y0ehuFxojg22j3TmkI/Vb52xVrBqThcscH91lR3OC/Nn0CQGKk
-Duob/Kkb1g3fIbuWitqOMfl3k/QRJvTfmhxz3MoFzFNWJSasSI+Tit2XqfUPk02D
-jqopBISHlhxlo52RjIcCQEW1KUjUzI07pFBChZ+gdVOwzpM5BUenCIauF520PeS8
-Rl61sLaVBI01IswtfZ+xegI6uXNL9wrAD6aWlvdqvp8=
+    // YOUR KEY HERE //
 -----END RSA PRIVATE KEY-----
 )EOF";
 ```
@@ -106,6 +82,8 @@ Once you run these commands you can get the certificate and key from the .txt fi
     CN - Common name (domain name)
 
 The subjectAltName parameter must contain the domain name(s) where your server is accessible. It can specify also IP addresses like this: 'subjectAltName=DNS:esp8266.local,IP:192.168.7.77'.
+
+Finally, to get the telegram's bot root SSL certificate you can export it using google chrome from https://api.telegram.org/botYOUR_BOT_TOKEN_HERE/sendMessage by clicking on your browser's lock icon (should be on the left side of the url) and then click on the export button. After that a .crt file will be downloaded where you can get the certificate from.
 
 ### NOTES
 

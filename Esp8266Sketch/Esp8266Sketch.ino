@@ -17,14 +17,11 @@
 #include "types.h"
 // Import the SetRoutes function alongside the calculateSHA256 function
 #include "routes.h"
+// Import the telegram utils
+#include "telegram.h"
 
 // Import the environment variables (ssid, password, static IP, default local gateway (get it from your router) & hmacKey)
 #include "envVariables.h"
-
-// Define NTP Server and Time Zone (remember, most authenticator apps will use the default values, UTC0, to avoid timezone issues)
-const char* ntpServerName = "pool.ntp.org";
-const int timeZone = 0;        // Change this to your time zone offset in seconds
-const int daylightOffset = 0;  // x hour offset for Daylight Saving Time (DST)
 
 IPAddress subnet(255, 255, 255, 0);
 IPAddress dns(1, 1, 1, 1);  // Cloudflare DNS (can be another like google's or a local one of your choice)
@@ -35,13 +32,12 @@ BearSSL::ServerSessions serverCache(5);
 ESP8266WebServer serverHTTP(80);
 
 WiFiUDP udp;
-// WakeOnLan WOL(udp); // Pass WiFiUDP class
-
-// Set the TOTP key to be used for code generation
-// TOTP totp = TOTP(hmacKey, 10);
 
 // Initial value for the TOTP code
 String totpCode = String("");
+
+// Create a list of certificates with the telegram certificate
+X509List telcert(telegramRootCert); 
 
 // getPublicIp attempts 3 times to get the router's public ip, waiting 5 seconds for each reattempt
 String getPublicIp() {
@@ -149,14 +145,18 @@ void setup() {
   serverHTTP.on("/", HTTP_GET, secureRedirect);
 
   // Synchronizes the time to an NTP server, after that, you can access the epoch time (# of seconds since Jan 1 1970) with time(nullptr)
+  const int timeZone = 0;        // Change this to your time zone offset in seconds
+  const int daylightOffset = 0;  // x hour offset for Daylight Saving Time (DST)
   Serial.print("Synching time: ");
-  configTime(0, 0, "pool.ntp.org");  // get UTC time via NTP
+  configTime(timeZone, daylightOffset, "pool.ntp.org");  // Get and set the time to UTC0 via an NTP server
   while (time(nullptr) < 24 * 3600) {
     Serial.print(".");
     delay(100);
   }
 
   Serial.println("Time synched with NTP server on UTC 0");
+
+  sendTelegramMessage("Hello from your SoC", BOT_TOKEN, CHAT_ID, telcert);
 
   secureServer.server.begin();
   serverHTTP.begin();
