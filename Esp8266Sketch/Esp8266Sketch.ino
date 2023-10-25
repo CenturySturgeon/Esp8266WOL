@@ -19,6 +19,8 @@
 #include "routes.h"
 // Import the telegram utils
 #include "telegram.h"
+// Import the wifi utils
+#include "wifi_utils.h"
 
 // Import the environment variables (ssid, password, static IP, default local gateway (get it from your router) & hmacKey)
 #include "envVariables.h"
@@ -37,7 +39,9 @@ WiFiUDP udp;
 String totpCode = String("");
 
 // Create a list of certificates with the telegram certificate
-X509List telcert(telegramRootCert); 
+X509List telegramCert(telegramRootCert); 
+// Create a list of certificates with the ipify certificate
+X509List ipifyCert(ipifyRootCert); 
 
 // Maximum lifetime for the sessions in seconds
 unsigned long maxSessionLifeTime = 60;
@@ -108,12 +112,14 @@ void setup() {
 
   Serial.println("Time synched with NTP server on UTC 0");
 
-  sendTelegramMessage("Hello from your SoC", BOT_TOKEN, CHAT_ID, telcert);
+  sendTelegramMessage("Hello from your SoC", BOT_TOKEN, CHAT_ID, telegramCert);
 
   secureServer.server.begin();
   serverHTTP.begin();
 
-  // String publicIP = getPublicIp();
+  String publicIP = getPublicIp(ipifyCert);
+  Serial.println("Public IP:");
+  Serial.println(publicIP);
 }
 
 void checkSessionTimeouts() {

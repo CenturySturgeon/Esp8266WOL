@@ -1,16 +1,22 @@
 // wifi_utils for the handling of wifi events
+#include <ESP8266WiFi.h>
+#include <WiFiClientSecure.h>
 
 // getPublicIp attempts 3 times to get the router's public ip, waiting 5 seconds for each reattempt
-String getPublicIp() {
+String getPublicIp(X509List &publicIpSiteCert) {
   String publicIp;
   for (int attempt = 1; attempt <= 3; attempt++) {
-    WiFiClient client;
-    if (client.connect("api.ipify.org", 80)) {
+
+    WiFiClientSecure client;
+    // Set the Esp8266 to trust ipify's certificate
+    client.setTrustAnchors(&publicIpSiteCert);
+
+    // Set the GET request on a single string
+    if (client.connect("api.ipify.org", 443)) {
       Serial.println("Connected to api.ipify.org");
-      client.println("GET / HTTP/1.1");
-      client.println("Host: api.ipify.org");
-      client.println("Connection: close");
-      client.println();
+      client.print(String("GET / HTTP/1.0\r\n"
+                          "Host: api.ipify.org\r\n"
+                          "Connection: close\r\n\r\n"));
 
       // Set a timeout for connecting
       unsigned long timeout = millis();
