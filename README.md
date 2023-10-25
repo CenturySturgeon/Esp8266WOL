@@ -83,10 +83,22 @@ Once you run these commands you can get the certificate and key from the .txt fi
 
 The subjectAltName parameter must contain the domain name(s) where your server is accessible. It can specify also IP addresses like this: 'subjectAltName=DNS:esp8266.local,IP:192.168.7.77'.
 
-Finally, to get the telegram's bot root SSL certificate you can export it using google chrome from https://api.telegram.org/botYOUR_BOT_TOKEN_HERE/sendMessage by clicking on your browser's lock icon (should be on the left side of the url) and then click on the export button. After that a .crt file will be downloaded where you can get the certificate from.
-
 ### NOTES
 
-To enhance security and prevent the storage of session credentials in plain text, the Crypto library is utilized to securely store them as SHA-256 encrypted hashes. You can install this library directly from the Arduino IDE, it's the one from Rhys Weatherly, more of this in the github repo https://github.com/rweather/arduinolibs. To generate your hashes, you can use online tools like this one https://emn178.github.io/online-tools/sha256.html.
+To enhance security and prevent the storage of session credentials in plain text, the Crypto library is utilized to securely safekeep them as SHA-256 encrypted hashes. You can install this library directly from the Arduino IDE, it's the one from Rhys Weatherly, more of this in the github repo https://github.com/rweather/arduinolibs. To generate your hashes, you can use online tools like this one https://emn178.github.io/online-tools/sha256.html or use the library and print them to serial for later use (which is safer than trusting a random site).
 
 You can read more about the WOL library used in this code at https://github.com/a7md0/WakeOnLan.
+
+This code uses a lot of certificates from different sites to enhance security, you can easily get them using openssl:
+
+```
+openssl s_client -connect www.your-site.com:443
+
+Copy the output from the terminal connection from '-----BEGIN CERTIFICATE-----' to '-----END CERTIFICATE-----' INCLUDING those two lines.
+```
+
+For example, to get the telegram cert for your bot api messages:
+
+```
+openssl s_client -connect api.telegram.org:443
+```
