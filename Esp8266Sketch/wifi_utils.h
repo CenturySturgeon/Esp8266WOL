@@ -69,6 +69,11 @@ String getPublicIp(X509List &publicIpSiteCert) {
   return String();  // Return an empty string after 3 failed attempts
 }
 
+bool isValidIP(const String& ip) {
+  IPAddress addr;
+  return addr.fromString(ip);
+}
+
 void synchTime() {
   // Synchronizes the time to an NTP server, after that, you can access the epoch time (# of seconds since Jan 1 1970) with time(nullptr)
   const int timeZone = 0;        // Change this to your time zone offset in seconds
