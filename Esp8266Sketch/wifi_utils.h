@@ -18,7 +18,7 @@ IPAddress dns(1, 1, 1, 1);
 
 // getPublicIp attempts 3 times to get the router's public ip, waiting 5 seconds for each reattempt
 String getPublicIp() {
-  String publicIp;
+  String ip;
   for (int attempt = 1; attempt <= 3; attempt++) {
 
     WiFiClientSecure client;
@@ -43,14 +43,14 @@ String getPublicIp() {
       }
 
       while (client.available()) {
-        publicIp = client.readStringUntil('\n');
+        ip = client.readStringUntil('\n');
       }
 
       // Close the connection
       client.stop();
 
-      if (publicIp.length() > 0) {
-        return publicIp;  // Successfully obtained the IP
+      if (ip.length() > 0) {
+        return ip;  // Successfully obtained the IP
       }
 
       Serial.println("IP not received on attempt " + String(attempt));
@@ -86,6 +86,7 @@ void synchTime() {
   Serial.println("Time synched with NTP server on UTC 0");
 }
 
+// Recursive function that doesn't stop until it gets a valid IPV4 address
 String persintentGetPublicIp () {
   String ip = getPublicIp();
   if (isValidIP(ip)) {
