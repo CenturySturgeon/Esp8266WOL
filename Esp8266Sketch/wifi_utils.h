@@ -11,8 +11,6 @@
 
 // Create a list of certificates with the ipify certificate to get the public ip
 X509List ipifyCert(ipifyRootCert);
-// Create a list of certificates with the telegram certificate to send telegram messages using your bot
-X509List telegramCert(telegramRootCert); 
 // Define your subnet
 IPAddress subnet(255, 255, 255, 0);
 // Cloudflare DNS (can be another like google's or a local one of your choice)
@@ -90,7 +88,7 @@ void synchTime() {
 
 void sendPublicIp() {
   String publicIP = getPublicIp(ipifyCert);
-  sendTelegramMessage("Your public IP: " + publicIP, BOT_TOKEN, CHAT_ID, telegramCert);
+  sendTelegramMessage("Your public IP: " + publicIP);
 }
 
 void connectToWiFi() {
