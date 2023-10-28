@@ -1,6 +1,22 @@
-// wifi_utils for the handling of wifi events
+// wifi_utils.h
+#ifndef WIFI_UTILS_H
+#define WIFI_UTILS_H
+
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
+// Import the environment variables
+#include "envVariables.h"
+// Import the telegram utils
+#include "telegram.h"
+
+// Create a list of certificates with the ipify certificate to get the public ip
+X509List ipifyCert(ipifyRootCert);
+// Create a list of certificates with the telegram certificate to send telegram messages using your bot
+X509List telegramCert(telegramRootCert); 
+// Define your subnet
+IPAddress subnet(255, 255, 255, 0);
+// Cloudflare DNS (can be another like google's or a local one of your choice)
+IPAddress dns(1, 1, 1, 1);
 
 // getPublicIp attempts 3 times to get the router's public ip, waiting 5 seconds for each reattempt
 String getPublicIp(X509List &publicIpSiteCert) {
@@ -83,7 +99,7 @@ void connectToWiFi() {
 void onWifiConnect(const WiFiEventStationModeGotIP& event) {
   Serial.println("Connected to Wi-Fi sucessfully.");
   Serial.println(WiFi.localIP());
-  publicIP = getPublicIp(ipifyCert);
+  String publicIP = getPublicIp(ipifyCert);
   sendTelegramMessage("Your public IP: " + publicIP, BOT_TOKEN, CHAT_ID, telegramCert);
 }
 
@@ -93,3 +109,5 @@ void onWifiDisconnect(const WiFiEventStationModeDisconnected& event) {
   delay(2000);
   connectToWiFi();
 }
+
+#endif

@@ -1,4 +1,7 @@
-// telegram.h holds the functions necessary to send telegram messages
+// telegram.h
+#ifndef TELEGRAM_H
+#define TELEGRAM_H
+
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
@@ -28,3 +31,5 @@ void sendTelegramMessage(String message, String botToken, String chatId, X509Lis
 
   client.stop();
 }
+
+#endif
