@@ -102,6 +102,8 @@ String persintentGetPublicIp () {
 
 void sendPublicIp() {
   String ip = persintentGetPublicIp();
+  // Set the public ip now to avoid resending it in the first checkPublicIpChange check
+  publicIp = ip;
   sendTelegramMessage("Your public IP: " + ip);
 }
 
