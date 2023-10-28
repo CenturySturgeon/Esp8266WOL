@@ -1,4 +1,7 @@
 // types.h
+#ifndef TYPES_H
+#define TYPES_H
+
 #include <WiFiUdp.h>
 #include <ESP8266WebServerSecure.h>
 
@@ -100,3 +103,5 @@ struct SecureServer {
     server.send(301, "text/plain", "Redirecting to " + path);
   }
 };
+
+#endif

@@ -25,9 +25,6 @@
 // Import the environment variables (ssid, password, static IP, default local gateway (get it from your router) & hmacKey)
 #include "envVariables.h"
 
-IPAddress subnet(255, 255, 255, 0);
-IPAddress dns(1, 1, 1, 1);  // Cloudflare DNS (can be another like google's or a local one of your choice)
-
 // Set the main webserver on port 443 (HTTPS)
 BearSSL::ServerSessions serverCache(5);
 // Set a secondary web server for HTTP redirection to HTTPS
@@ -37,11 +34,6 @@ WiFiUDP udp;
 
 // Initial value for the TOTP code
 String totpCode = String("");
-
-// Create a list of certificates with the telegram certificate
-X509List telegramCert(telegramRootCert); 
-// Create a list of certificates with the ipify certificate
-X509List ipifyCert(ipifyRootCert); 
 
 // Maximum lifetime for the sessions in seconds
 unsigned long maxSessionLifeTime = 60;
@@ -68,19 +60,7 @@ void setup() {
   // Start Serial for debugging
   Serial.begin(115200);
 
-  // Set the WiFi mode to station (the Soc connects as a client to the WiFi, instead of becoming an access point)
-  WiFi.mode(WIFI_STA);
-  // Connect to WiFi
-  WiFi.begin(ssid, password);
-  // Configures static IP address
-  WiFi.config(staticIP, gateway, subnet, dns);
-  // Retry connection until success
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.println("Connecting to WiFi...");
-  }
-  Serial.println("Connected to WiFi with IP: ");
-  Serial.println(WiFi.localIP());
+  connectToWiFi();
 
   secureServer.WOL.setRepeat(3, 100);                                             // Repeat the packet three times with 100ms delay between
   secureServer.WOL.calculateBroadcastAddress(WiFi.localIP(), WiFi.subnetMask());  // Calculate and set broadcast address
@@ -100,26 +80,8 @@ void setup() {
   // Redirect all users using HTTP to the HTTPS server
   serverHTTP.on("/", HTTP_GET, secureRedirect);
 
-  // Synchronizes the time to an NTP server, after that, you can access the epoch time (# of seconds since Jan 1 1970) with time(nullptr)
-  const int timeZone = 0;        // Change this to your time zone offset in seconds
-  const int daylightOffset = 0;  // x hour offset for Daylight Saving Time (DST)
-  Serial.print("Synching time: ");
-  configTime(timeZone, daylightOffset, "pool.ntp.org");  // Get and set the time to UTC0 via an NTP server
-  while (time(nullptr) < 24 * 3600) {
-    Serial.print(".");
-    delay(100);
-  }
-
-  Serial.println("Time synched with NTP server on UTC 0");
-
-  sendTelegramMessage("Hello from your SoC", BOT_TOKEN, CHAT_ID, telegramCert);
-
   secureServer.server.begin();
   serverHTTP.begin();
-
-  String publicIP = getPublicIp(ipifyCert);
-  Serial.println("Public IP:");
-  Serial.println(publicIP);
 }
 
 void checkSessionTimeouts() {
