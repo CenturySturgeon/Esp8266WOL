@@ -11,6 +11,10 @@
 
 // Create a list of certificates with the ipify certificate to get the public ip
 X509List ipifyCert(ipifyRootCert);
+// Initial value for the public IP
+String publicIp = "127.0.0.1";
+// Initial value for the lastCheckTime marker, this is used to check if the public ip has changed
+unsigned long lastCheckTime = millis();
 // Define your subnet
 IPAddress subnet(255, 255, 255, 0);
 // Cloudflare DNS (can be another like google's or a local one of your choice)
@@ -129,5 +133,25 @@ void checkAndReconnect() {
     delay(3000);
   }
 }
+
+void checkPublicIpChange () {
+  // Get the current time in milliseconds
+  unsigned long currentTime = millis();
+
+  // Check if 60 minutes (3600000 milliseconds) have passed since the last check
+  if (currentTime - lastCheckTime >= 3600000) {
+    // Update the last check time
+    lastCheckTime = currentTime;
+
+    // Check if the public IP has changed
+    String currentPublicIp = persintentGetPublicIp();
+    if (currentPublicIp != publicIp) {
+      // Public IP has changed, send the new one
+      sendTelegramMessage("Your public IP changet to: " + currentPublicIp);
+      publicIp = currentPublicIp;  // Update the previous value
+    }
+  }
+}
+
 
 #endif

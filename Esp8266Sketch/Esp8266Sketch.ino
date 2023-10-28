@@ -99,10 +99,18 @@ void checkSessionTimeouts() {
 }
 
 void loop() {
+
+  // Check for disconnections to the WiFi and attempt to reconnect if necessary
   checkAndReconnect();
+  // Check for changes in the public ip every hour
+  checkPublicIpChange();
+
+  // Handle the clients and update the MDNS
   serverHTTP.handleClient();
   secureServer.server.handleClient();
   MDNS.update();
+
   // Routinely check for session timeouts
   checkSessionTimeouts();
+  
 }
