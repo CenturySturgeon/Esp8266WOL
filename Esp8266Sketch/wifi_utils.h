@@ -69,21 +69,7 @@ String getPublicIp(X509List &publicIpSiteCert) {
   return String();  // Return an empty string after 3 failed attempts
 }
 
-void connectToWiFi() {
-  // Set the WiFi mode to station (the Soc connects as a client to the WiFi, instead of becoming an access point)
-  WiFi.mode(WIFI_STA);
-  // Connect to WiFi
-  WiFi.begin(ssid, password);
-  // Configures static IP address
-  WiFi.config(staticIP, gateway, subnet, dns);
-  // Retry connection until success
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.println("Connecting to WiFi...");
-  }
-  Serial.println("Connected to WiFi with IP: ");
-  Serial.println(WiFi.localIP());
-
+void synchTime() {
   // Synchronizes the time to an NTP server, after that, you can access the epoch time (# of seconds since Jan 1 1970) with time(nullptr)
   const int timeZone = 0;        // Change this to your time zone offset in seconds
   const int daylightOffset = 0;  // x hour offset for Daylight Saving Time (DST)
@@ -92,22 +78,43 @@ void connectToWiFi() {
   while (time(nullptr) < 24 * 3600) {
     Serial.print(".");
     delay(100);
+    yield();
   }
   Serial.println("Time synched with NTP server on UTC 0");
 }
 
-void onWifiConnect(const WiFiEventStationModeGotIP& event) {
-  Serial.println("Connected to Wi-Fi sucessfully.");
-  Serial.println(WiFi.localIP());
+void sendPublicIp() {
   String publicIP = getPublicIp(ipifyCert);
   sendTelegramMessage("Your public IP: " + publicIP, BOT_TOKEN, CHAT_ID, telegramCert);
 }
 
-void onWifiDisconnect(const WiFiEventStationModeDisconnected& event) {
-  Serial.println("Disconnected from Wi-Fi, trying to connect...");
-  WiFi.disconnect();
-  delay(5000);
+void connectToWiFi() {
+  // Set the WiFi mode to station (the Soc connects as a client to the WiFi, instead of becoming an access point)
+  WiFi.mode(WIFI_STA);
+  // Configures static IP address
+  WiFi.config(staticIP, gateway, subnet, dns);
+  // Connect to WiFi
+  WiFi.begin(ssid, password);
+  // Retry connection until success
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Connecting to WiFi...");
+    yield();
+  }
+  synchTime();
+}
+
+void connectAndSendIp() {
   connectToWiFi();
+  sendPublicIp();
+}
+
+void checkAndReconnect() {
+  if (WiFi.status() != WL_CONNECTED) {
+    Serial.println("WiFi connection lost. Reconnecting...");
+    connectAndSendIp(); // Reconnect when the connection is lost
+    delay(3000);
+  }
 }
 
 #endif

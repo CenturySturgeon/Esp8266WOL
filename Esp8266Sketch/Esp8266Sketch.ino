@@ -31,9 +31,6 @@ BearSSL::ServerSessions serverCache(5);
 ESP8266WebServer serverHTTP(80);
 
 WiFiUDP udp;
-// Declare WiFi event handlers
-WiFiEventHandler wifiConnectHandler;
-WiFiEventHandler wifiDisconnectHandler;
 
 // Initial value for the TOTP code
 String totpCode = String("");
@@ -63,11 +60,8 @@ void setup() {
   // Start Serial for debugging
   Serial.begin(115200);
 
-  //Register WiFi event handlers
-  wifiConnectHandler = WiFi.onStationModeGotIP(onWifiConnect);
-  wifiDisconnectHandler = WiFi.onStationModeDisconnected(onWifiDisconnect);
-
-  connectToWiFi();
+  // Connect to WiFi and send the public ip over telegram
+  connectAndSendIp();
 
   secureServer.WOL.setRepeat(3, 100);                                             // Repeat the packet three times with 100ms delay between
   secureServer.WOL.calculateBroadcastAddress(WiFi.localIP(), WiFi.subnetMask());  // Calculate and set broadcast address
@@ -105,6 +99,7 @@ void checkSessionTimeouts() {
 }
 
 void loop() {
+  checkAndReconnect();
   serverHTTP.handleClient();
   secureServer.server.handleClient();
   MDNS.update();
