@@ -72,10 +72,13 @@ void connectToWiFi() {
 void onWifiConnect(const WiFiEventStationModeGotIP& event) {
   Serial.println("Connected to Wi-Fi sucessfully.");
   Serial.println(WiFi.localIP());
+  publicIP = getPublicIp(ipifyCert);
+  sendTelegramMessage("Your public IP: " + publicIP, BOT_TOKEN, CHAT_ID, telegramCert);
 }
 
 void onWifiDisconnect(const WiFiEventStationModeDisconnected& event) {
   Serial.println("Disconnected from Wi-Fi, trying to connect...");
   WiFi.disconnect();
-  WiFi.begin(ssid, password);
+  delay(2000);
+  connectToWiFi();
 }
