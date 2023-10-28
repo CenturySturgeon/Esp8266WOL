@@ -17,13 +17,13 @@ IPAddress subnet(255, 255, 255, 0);
 IPAddress dns(1, 1, 1, 1);
 
 // getPublicIp attempts 3 times to get the router's public ip, waiting 5 seconds for each reattempt
-String getPublicIp(X509List &publicIpSiteCert) {
+String getPublicIp() {
   String publicIp;
   for (int attempt = 1; attempt <= 3; attempt++) {
 
     WiFiClientSecure client;
     // Set the Esp8266 to trust ipify's certificate
-    client.setTrustAnchors(&publicIpSiteCert);
+    client.setTrustAnchors(&ipifyCert);
 
     // Set the GET request on a single string
     if (client.connect("api.ipify.org", 443)) {
@@ -86,9 +86,18 @@ void synchTime() {
   Serial.println("Time synched with NTP server on UTC 0");
 }
 
+String persintentGetPublicIp () {
+  String ip = getPublicIp();
+  if (isValidIP(ip)) {
+    return ip;
+  } else {
+    return persintentGetPublicIp();
+  }
+}
+
 void sendPublicIp() {
-  String publicIP = getPublicIp(ipifyCert);
-  sendTelegramMessage("Your public IP: " + publicIP);
+  String ip = persintentGetPublicIp();
+  sendTelegramMessage("Your public IP: " + ip);
 }
 
 void connectToWiFi() {
