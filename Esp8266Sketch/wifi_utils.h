@@ -106,7 +106,7 @@ void onWifiConnect(const WiFiEventStationModeGotIP& event) {
 void onWifiDisconnect(const WiFiEventStationModeDisconnected& event) {
   Serial.println("Disconnected from Wi-Fi, trying to connect...");
   WiFi.disconnect();
-  delay(2000);
+  delay(5000);
   connectToWiFi();
 }
 
