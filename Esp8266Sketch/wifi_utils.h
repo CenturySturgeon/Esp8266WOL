@@ -67,6 +67,17 @@ void connectToWiFi() {
   }
   Serial.println("Connected to WiFi with IP: ");
   Serial.println(WiFi.localIP());
+
+  // Synchronizes the time to an NTP server, after that, you can access the epoch time (# of seconds since Jan 1 1970) with time(nullptr)
+  const int timeZone = 0;        // Change this to your time zone offset in seconds
+  const int daylightOffset = 0;  // x hour offset for Daylight Saving Time (DST)
+  Serial.print("Synching time: ");
+  configTime(timeZone, daylightOffset, "pool.ntp.org");  // Get and set the time to UTC0 via an NTP server
+  while (time(nullptr) < 24 * 3600) {
+    Serial.print(".");
+    delay(100);
+  }
+  Serial.println("Time synched with NTP server on UTC 0");
 }
 
 void onWifiConnect(const WiFiEventStationModeGotIP& event) {
