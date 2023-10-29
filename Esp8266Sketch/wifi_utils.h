@@ -39,15 +39,17 @@ String getPublicIp() {
       // Set a timeout for connecting
       unsigned long timeout = millis();
       while (client.available() == 0) {
-        if (millis() - timeout > 5000) {
+        if (millis() - timeout > 2000) {
           Serial.println("Client timeout");
           client.stop();
           break;  // Retry on timeout
         }
+        yield();
       }
 
       while (client.available()) {
         ip = client.readStringUntil('\n');
+        yield();
       }
 
       // Close the connection
@@ -63,8 +65,9 @@ String getPublicIp() {
     }
 
     if (attempt < 3) {
-      Serial.println("Waiting 5 seconds before reattempt...");
-      delay(5000);  // Wait 5 seconds before reattempt
+      Serial.println("Waiting 2 seconds before reattempt...");
+      yield();
+      delay(2000);
     }
   }
 
@@ -96,6 +99,7 @@ String persintentGetPublicIp () {
   if (isValidIP(ip)) {
     return ip;
   } else {
+    yield();
     return persintentGetPublicIp();
   }
 }
