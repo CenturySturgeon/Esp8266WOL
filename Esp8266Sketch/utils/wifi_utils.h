@@ -42,7 +42,7 @@ String getPublicIp() {
 
     // Set the GET request on a single string
     if (client.connect(ipSiteAddress, 443)) {
-      Serial.println("Connected to" + ipSiteAddress);
+      Serial.println("Connected to " + ipSiteAddress);
       client.print(String("GET / HTTP/1.0\r\n"
                           "Host:" + ipSiteAddress + "\r\n"
                           "Connection: close\r\n\r\n"));

@@ -23,7 +23,7 @@ struct UserSession {
   unsigned long lifeTime;      // Maximum session lifetime in seconds
 };
 
-// Define the SecureServer struct
+// SecureServer struct holds the ESP8266WebServerSecure, the userSessions, the TOTP object, and the WOL object
 struct SecureServer {
   BearSSL::ESP8266WebServerSecure server;
   UserSession userSessions[2];

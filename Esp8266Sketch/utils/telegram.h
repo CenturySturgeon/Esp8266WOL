@@ -7,9 +7,10 @@
 #include <ArduinoJson.h>
 #include "../envVariables.h"
 
-// Create a list of certificates with the telegram certificate to send telegram messages using your bot
+// Create a list of certificates with the telegramRootCert certificate to send telegram messages using your bot
 X509List telegramCert(telegramRootCert); 
 
+// Sends the provided message using your telegram bot
 void sendTelegramMessage(String message) {
   WiFiClientSecure client;
   // client.setInsecure(); // Remember, setInsecure makes the client to not validate the ssl certificate

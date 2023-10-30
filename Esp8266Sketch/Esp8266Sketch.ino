@@ -62,7 +62,7 @@ void setup() {
   Serial.begin(115200);
 
   // Connect to WiFi and send the public ip over telegram
-  connectAndSendIp("ESP8266 on Start Public IP: ");
+  connectAndSendIp("On Start Public IP: ");
 
   secureServer.WOL.setRepeat(3, 100);                                             // Repeat the packet three times with 100ms delay between
   secureServer.WOL.calculateBroadcastAddress(WiFi.localIP(), WiFi.subnetMask());  // Calculate and set broadcast address

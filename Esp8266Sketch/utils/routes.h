@@ -31,6 +31,7 @@ String calculateSHA256Hash(const String &inputString) {
 
 // Sets the path handlers for the server variable inputed
 void setServerRoutes(SecureServer &secureServer) {
+  // Home path handler
   secureServer.server.on("/", HTTP_GET, [&]() {
     if (secureServer.handleAuthentication("")) {
       secureServer.redirectTo("/wol");
@@ -39,6 +40,7 @@ void setServerRoutes(SecureServer &secureServer) {
     }
   });
 
+  // WOL path handler
   secureServer.server.on("/wol", HTTP_GET, [&]() {
     if (secureServer.handleAuthentication("")) {
       secureServer.server.send(200, "text/html", wol_html);
@@ -47,6 +49,7 @@ void setServerRoutes(SecureServer &secureServer) {
     }
   });
 
+  // Login path handler
   secureServer.server.on("/login", HTTP_GET, [&]() {
     if (secureServer.handleAuthentication("")) {
       secureServer.redirectTo("/wol");
@@ -55,7 +58,7 @@ void setServerRoutes(SecureServer &secureServer) {
     }
   });
 
-  // Handle the login submission
+  // Login submission handler
   secureServer.server.on("/login", HTTP_POST, [&]() {
     String username = secureServer.server.arg("username").substring(0, 16);
     String password = secureServer.server.arg("password").substring(0, 16);
@@ -68,7 +71,7 @@ void setServerRoutes(SecureServer &secureServer) {
     }
   });
 
-  // Handle the WOL form submission
+  // WOL submission handler
   secureServer.server.on("/wol", HTTP_POST, [&]() {
     String macAddress = secureServer.server.arg("macAddress").substring(0, 17);
     String secureOn = secureServer.server.arg("secureOn").substring(0, 17);
