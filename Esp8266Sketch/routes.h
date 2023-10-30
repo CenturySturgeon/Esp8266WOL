@@ -5,8 +5,8 @@
 #include <SHA256.h>
 
 // Import the html files
-#include "wol_html.h"
-#include "login_html.h"
+#include "./views/wol_html.h"
+#include "./views/login_html.h"
 
 // Function that returns the SHA256 hash for the provided string
 String calculateSHA256Hash(const String &inputString) {
