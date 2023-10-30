@@ -104,11 +104,11 @@ String persintentGetPublicIp () {
   }
 }
 
-void sendPublicIp() {
+void sendPublicIp(String messagePrefix) {
   String ip = persintentGetPublicIp();
   // Set the public ip now to avoid resending it in the first checkPublicIpChange check
   publicIp = ip;
-  sendTelegramMessage("Your public IP: " + ip);
+  sendTelegramMessage(messagePrefix + ip);
 }
 
 void connectToWiFi() {
@@ -127,15 +127,15 @@ void connectToWiFi() {
   synchTime();
 }
 
-void connectAndSendIp() {
+void connectAndSendIp(String messagePrefix) {
   connectToWiFi();
-  sendPublicIp();
+  sendPublicIp(messagePrefix);
 }
 
 void checkAndReconnect() {
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("WiFi connection lost. Reconnecting...");
-    connectAndSendIp(); // Reconnect when the connection is lost
+    connectAndSendIp("WiFi connection lost. Public IP: "); // Reconnect when the connection is lost
     delay(3000);
   }
 }
@@ -153,7 +153,7 @@ void checkPublicIpChange () {
     String currentPublicIp = persintentGetPublicIp();
     if (currentPublicIp != publicIp) {
       // Public IP has changed, send the new one
-      sendTelegramMessage("Your public IP changet to: " + currentPublicIp);
+      sendTelegramMessage("Your public IP changed to: " + currentPublicIp);
       publicIp = currentPublicIp;  // Update the previous value
     }
   }
