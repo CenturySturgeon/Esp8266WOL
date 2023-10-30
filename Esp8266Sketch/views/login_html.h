@@ -51,6 +51,8 @@ const char* login_html = R"EOF(
             color: #fff;
             cursor: pointer;
             width: 100%;
+            font-size: medium;
+            font-weight: bold;
         }
         .input-group button[type="submit"]:hover {
             background: #555;
