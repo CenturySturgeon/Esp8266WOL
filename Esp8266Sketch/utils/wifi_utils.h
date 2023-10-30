@@ -9,31 +9,42 @@
 // Import the telegram utils
 #include "telegram.h"
 
-// Create a list of certificates with the ipify certificate to get the public ip
-X509List ipifyCert(ipifyRootCert);
-// Initial value for the public IP
-String publicIp = "127.0.0.1";
-// Initial value for the lastCheckTime marker, this is used to check if the public ip has changed
-unsigned long lastCheckTime = millis();
 // Define your subnet
 IPAddress subnet(255, 255, 255, 0);
 // Cloudflare DNS (can be another like google's or a local one of your choice)
 IPAddress dns(1, 1, 1, 1);
+// Your time zone offset in seconds (recommendation is to leave it at 0 for TOTP)
+const int timeZone = 0;
+// X hour offset for Daylight Saving Time "DST" (recommendation is to leave it at 0 for TOTP)
+const int daylightOffset = 0;
+// NTP server to synch the time with
+String ntpServer = "pool.ntp.org";
+// Address used to get your public IP
+String ipSiteAddress = "api.ipify.org";
+// Time interval in miliseconds to get the public IP, check if it changed and if so re-send it
+unsigned long checkPublicIpInterval = 3600000;
 
-// getPublicIp attempts 3 times to get the router's public ip, waiting 5 seconds for each reattempt
+// Create a list of certificates with the ipifyRootCert certificate to get the public IP
+X509List ipSiteCert(ipifyRootCert);
+// Initial value for the public IP (127.0.0.1 corresponds to the loopback address and is not routable on the public internet)
+String publicIp = "127.0.0.1";
+// Initial value for the lastCheckTime marker, this is used to check if the public IP has changed
+unsigned long lastCheckTime = millis();
+
+// Attempts 3 times to get the router's public IP, waiting 2 seconds for each reattempt
 String getPublicIp() {
   String ip;
   for (int attempt = 1; attempt <= 3; attempt++) {
 
     WiFiClientSecure client;
     // Set the Esp8266 to trust ipify's certificate
-    client.setTrustAnchors(&ipifyCert);
+    client.setTrustAnchors(&ipSiteCert);
 
     // Set the GET request on a single string
-    if (client.connect("api.ipify.org", 443)) {
-      Serial.println("Connected to api.ipify.org");
+    if (client.connect(ipSiteAddress, 443)) {
+      Serial.println("Connected to" + ipSiteAddress);
       client.print(String("GET / HTTP/1.0\r\n"
-                          "Host: api.ipify.org\r\n"
+                          "Host:" + ipSiteAddress + "\r\n"
                           "Connection: close\r\n\r\n"));
 
       // Set a timeout for connecting
@@ -61,7 +72,7 @@ String getPublicIp() {
 
       Serial.println("IP not received on attempt " + String(attempt));
     } else {
-      Serial.println("Connection to ipify.org failed on attempt " + String(attempt));
+      Serial.println("Connection to " + ipSiteAddress + " failed on attempt " + String(attempt));
     }
 
     if (attempt < 3) {
@@ -74,19 +85,19 @@ String getPublicIp() {
   return String();  // Return an empty string after 3 failed attempts
 }
 
+// Returns wether the provided string is a valid IP or not
 bool isValidIP(const String& ip) {
   IPAddress addr;
   return addr.fromString(ip);
 }
 
+// Synchronises the Esp's time with an NTP server of your choice
 void synchTime() {
   // Synchronizes the time to an NTP server, after that, you can access the epoch time (# of seconds since Jan 1 1970) with time(nullptr)
-  const int timeZone = 0;        // Change this to your time zone offset in seconds
-  const int daylightOffset = 0;  // x hour offset for Daylight Saving Time (DST)
-  Serial.print("Synching time: ");
-  configTime(timeZone, daylightOffset, "pool.ntp.org");  // Get and set the time to UTC0 via an NTP server
+  Serial.println("Synching time: ");
+  configTime(timeZone, daylightOffset, ntpServer);  // Get and set the time to UTC0 via an NTP server
   while (time(nullptr) < 24 * 3600) {
-    Serial.print(".");
+    Serial.println(".");
     delay(100);
     yield();
   }
@@ -104,13 +115,15 @@ String persintentGetPublicIp () {
   }
 }
 
+// Gets the public IP and sends it over telegram
 void sendPublicIp(String messagePrefix) {
   String ip = persintentGetPublicIp();
-  // Set the public ip now to avoid resending it in the first checkPublicIpChange check
+  // Set the public IP now to avoid resending it in the first checkPublicIpChange check
   publicIp = ip;
   sendTelegramMessage(messagePrefix + ip);
 }
 
+// Connects to the WiFi network and synchs the time with the NTP server
 void connectToWiFi() {
   // Set the WiFi mode to station (the Soc connects as a client to the WiFi, instead of becoming an access point)
   WiFi.mode(WIFI_STA);
@@ -127,25 +140,28 @@ void connectToWiFi() {
   synchTime();
 }
 
+// Connects to the WiFi network, synchs the time, and sends the public IP with a message prefix
 void connectAndSendIp(String messagePrefix) {
   connectToWiFi();
   sendPublicIp(messagePrefix);
 }
 
+// Constantly checks the WiFi connection. If disconnected, it attempts to reconnect and on success re-sends the public IP
 void checkAndReconnect() {
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("WiFi connection lost. Reconnecting...");
-    connectAndSendIp("WiFi connection lost. Public IP: "); // Reconnect when the connection is lost
+    connectAndSendIp("WiFi connection lost. Public IP: ");
     delay(3000);
   }
 }
 
+// Checks if the public IP changed for the specified interval of time, re-sending if it changed
 void checkPublicIpChange () {
   // Get the current time in milliseconds
   unsigned long currentTime = millis();
 
-  // Check if 60 minutes (3600000 milliseconds) have passed since the last check
-  if (currentTime - lastCheckTime >= 3600000) {
+  // Check if checkPublicIpInterval amount of time has passed since the last check
+  if (currentTime - lastCheckTime >= checkPublicIpInterval) {
     // Update the last check time
     lastCheckTime = currentTime;
 
@@ -158,6 +174,5 @@ void checkPublicIpChange () {
     }
   }
 }
-
 
 #endif
