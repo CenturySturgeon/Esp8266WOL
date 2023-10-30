@@ -15,13 +15,13 @@
 #include <WakeOnLan.h>
 
 // Import the SecureServer
-#include "types.h"
+#include "./utils/types.h"
 // Import the SetRoutes function alongside the calculateSHA256 function
-#include "routes.h"
+#include "./utils/routes.h"
 // Import the telegram utils
-#include "telegram.h"
+#include "./utils/telegram.h"
 // Import the wifi utils
-#include "wifi_utils.h"
+#include "./utils/wifi_utils.h"
 
 // Import the environment variables (ssid, password, static IP, default local gateway (get it from your router) & hmacKey)
 #include "envVariables.h"

@@ -5,7 +5,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 #include <ArduinoJson.h>
-#include "envVariables.h"
+#include "../envVariables.h"
 
 // Create a list of certificates with the telegram certificate to send telegram messages using your bot
 X509List telegramCert(telegramRootCert); 

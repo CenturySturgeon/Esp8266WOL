@@ -5,7 +5,7 @@
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
 // Import the environment variables
-#include "envVariables.h"
+#include "../envVariables.h"
 // Import the telegram utils
 #include "telegram.h"
 
