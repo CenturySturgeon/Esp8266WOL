@@ -2,6 +2,8 @@
 
 This program configures your Esp8266 as a web server, equipping it with the capability to dispatch magic packets for awakening any device within your local area network (LAN). The web server implements HTTPS for secure and private connections, bolstered by Two-Factor Authentication (2FA) through Time-Based One-Time Passwords (TOTP) to thwart potential threats seeking to rouse your devices maliciously.
 
+![Diagram](https://github.com/CenturySturgeon/Esp8266WOL/blob/main/WOL_Diagram.svg)
+
 ### Requirements
 
 The Esp8266 device loads your credentials, keys and certificate from a file 'envVariables.h' that should look like this:
