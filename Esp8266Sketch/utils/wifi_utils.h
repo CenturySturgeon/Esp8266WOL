@@ -9,8 +9,6 @@
 // Import the telegram utils
 #include "telegram.h"
 
-// Define your subnet
-IPAddress subnet(255, 255, 255, 0);
 // Cloudflare DNS (can be another like google's or a local one of your choice)
 IPAddress dns(1, 1, 1, 1);
 // Your time zone offset in seconds (recommendation is to leave it at 0 for TOTP)
