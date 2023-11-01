@@ -1,8 +1,28 @@
 # Esp8266WOL: Wake devices on your LAN, over the internet, using an SoC
 
-This program configures your Esp8266 as a web server, equipping it with the capability to dispatch magic packets for awakening any device within your local area network (LAN). The web server implements HTTPS for secure and private connections, bolstered by Two-Factor Authentication (2FA) through Time-Based One-Time Passwords (TOTP) to thwart potential threats seeking to rouse your devices maliciously.
+Configure your Esp8266 as a web server, equipping it with the capability to dispatch magic packets for awakening any device within your local area network (LAN). The web server implements HTTPS for secure and private connections, bolstered by Two-Factor Authentication (2FA) through Time-Based One-Time Passwords (TOTP) to thwart potential threats seeking to rouse your devices maliciously.
 
 ![Diagram](https://github.com/CenturySturgeon/Esp8266WOL/blob/main/WOL_Diagram.svg)
+
+### NOTES
+
+This code uses a lot of certificates from different sites to enhance security, you can easily get them using openssl:
+
+```
+openssl s_client -connect www.your-site.com:443
+```
+
+Copy the output from the terminal connection from '-----BEGIN CERTIFICATE-----' to '-----END CERTIFICATE-----' INCLUDING those two lines.
+
+For example, to get the telegram cert for your bot api messages:
+
+```
+openssl s_client -connect api.telegram.org:443
+```
+
+The code uses the Crypto library to securely safekeep passwords as SHA-256 encrypted hashes amd not in plain text. You can install this library directly from the Arduino IDE, it's the one from Rhys Weatherly, more of this in the github repo https://github.com/rweather/arduinolibs. To generate your hashes, you can use online tools like https://emn178.github.io/online-tools/sha256.html or use the library and print them to serial for later use (which is safer than trusting a random site).
+
+You can read more about the WOL library used in this code at https://github.com/a7md0/WakeOnLan.
 
 ### Requirements
 
@@ -37,22 +57,19 @@ static const char serverKey[] PROGMEM =  R"EOF(
 )EOF";
 ```
 
-You should place this file on the same level as the Esp8266Sketch.ino. If you cloned this repo, the folder structure should look like this:
+This file should be on the same level as the Esp8266Sketch.ino. If you cloned this repo, the folder structure should look like this:
 
 ```
 Esp8266Sketch/
-├── envVariables
-├── Esp8266Sketch.ino
-├── login_html.h
-└── wol_html.h
+├── utils/
+├── views/
+├── envVariables.h
+└── Esp8266Sketch.ino
 .gitignore
 qrCodeMaker.py
-README.md
 ```
 
 ### Generating Requirements
-
-If you don't know what any of the variables form 'envVariables.h' are, don't worry, you'll find the explanation bellow:
 
 The 'ssid' and 'password' variables hold your WiFi network name and password respectively. These allow the Esp8266 to connect to your WiFi, enabling it to send the magic packets to any device in that network.
 
@@ -84,23 +101,3 @@ Once you run these commands you can get the certificate and key from the .txt fi
     CN - Common name (domain name)
 
 The subjectAltName parameter must contain the domain name(s) where your server is accessible. It can specify also IP addresses like this: 'subjectAltName=DNS:esp8266.local,IP:192.168.7.77'.
-
-### NOTES
-
-To enhance security and prevent the storage of session credentials in plain text, the Crypto library is utilized to securely safekeep them as SHA-256 encrypted hashes. You can install this library directly from the Arduino IDE, it's the one from Rhys Weatherly, more of this in the github repo https://github.com/rweather/arduinolibs. To generate your hashes, you can use online tools like this one https://emn178.github.io/online-tools/sha256.html or use the library and print them to serial for later use (which is safer than trusting a random site).
-
-You can read more about the WOL library used in this code at https://github.com/a7md0/WakeOnLan.
-
-This code uses a lot of certificates from different sites to enhance security, you can easily get them using openssl:
-
-```
-openssl s_client -connect www.your-site.com:443
-
-Copy the output from the terminal connection from '-----BEGIN CERTIFICATE-----' to '-----END CERTIFICATE-----' INCLUDING those two lines.
-```
-
-For example, to get the telegram cert for your bot api messages:
-
-```
-openssl s_client -connect api.telegram.org:443
-```
