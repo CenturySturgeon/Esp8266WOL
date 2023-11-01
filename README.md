@@ -66,20 +66,20 @@ static const char serverCert[] PROGMEM = R"EOF(
 // Private key for ssl connection over HTTPS
 static const char serverKey[] PROGMEM =  R"EOF(
 -----BEGIN RSA PRIVATE KEY-----
-//    YOUR CERT HERE    //
+//    YOUR KEY HERE    //
 -----END RSA PRIVATE KEY-----
 )EOF";
 
 
 const char telegramRootCert [] PROGMEM = R"CERT(
 -----BEGIN CERTIFICATE-----
-//    YOUR CERT HERE    //
+//      CERT HERE     //
 -----END CERTIFICATE-----
 )CERT";
 
 const char ipSiteRootCert [] PROGMEM = R"CERT(
 -----BEGIN CERTIFICATE-----
-//    YOUR CERT HERE    //
+//      CERT HERE      //
 -----END CERTIFICATE-----
 )CERT";
 
