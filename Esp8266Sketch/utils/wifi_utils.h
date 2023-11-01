@@ -24,8 +24,8 @@ String ipSiteAddress = "api.ipify.org";
 // Time interval in miliseconds to get the public IP, check if it changed and if so re-send it
 unsigned long checkPublicIpInterval = 3600000;
 
-// Create a list of certificates with the ipifyRootCert certificate to get the public IP
-X509List ipSiteCert(ipifyRootCert);
+// Create a list of certificates with the ipSiteRootCert certificate to get the public IP
+X509List ipSiteCert(ipSiteRootCert);
 // Initial value for the public IP (127.0.0.1 corresponds to the loopback address and is not routable on the public internet)
 String publicIp = "127.0.0.1";
 // Initial value for the lastCheckTime marker, this is used to check if the public IP has changed

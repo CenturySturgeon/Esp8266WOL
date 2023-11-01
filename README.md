@@ -20,7 +20,7 @@ For example, to get the telegram cert for your bot api messages:
 openssl s_client -connect api.telegram.org:443
 ```
 
-The code uses the Crypto library to securely safekeep passwords as SHA-256 encrypted hashes amd not in plain text. You can install this library directly from the Arduino IDE, it's the one from Rhys Weatherly, more of this in the github repo https://github.com/rweather/arduinolibs. To generate your hashes, you can use online tools like https://emn178.github.io/online-tools/sha256.html or use the library and print them to serial for later use (which is safer than trusting a random site).
+The Crypto library is used to securely safekeep passwords as SHA-256 encrypted hashes amd not in plain text. You can install this library directly from the Arduino IDE, it's the one from Rhys Weatherly, more of this in the github repo https://github.com/rweather/arduinolibs. To generate your hashes, you can use online tools like https://emn178.github.io/online-tools/sha256.html or use the library and print them to serial for later use (which is safer than trusting a random site).
 
 You can read more about the WOL library used in this code at https://github.com/a7md0/WakeOnLan.
 
@@ -29,32 +29,57 @@ You can read more about the WOL library used in this code at https://github.com/
 The Esp8266 device loads your credentials, keys and certificate from a file 'envVariables.h' that should look like this:
 
 ```
+// envVariables.h
+#ifndef ENVVARIABLES_H
+#define ENVVARIABLES_H
+
 // Replace with your network credentials
 const char* ssid = "YOUR_WIFI_NAME";
 const char* password = "YOUR_WIFI_PASSWORD";
 
-// Set the static IP address for your Esp8266 (especially important for port forwarding)
+// Set static IP address
 IPAddress staticIP(192, 168, 7, 77);
-
 // Get the default local gateway from your router
 IPAddress gateway(192, 168, 8, 88);
 
-// Replace with your hmacKey hex values for TOTP generation (DO NOT use this one)
+// Set the hmacKey for TOTP generation
 uint8_t hmacKey[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 
-// Your certificate for ssl connection over HTTPS (DO NOT use this one)
+// Set your telegram bot API token
+String BOT_TOKEN = "XXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+
+// Set your telegram user id
+String CHAT_ID = "XXXXXXXXXX";
+
+
+// Cert for ssl connection over HTTPS
 static const char serverCert[] PROGMEM = R"EOF(
 -----BEGIN CERTIFICATE-----
-    // YOUR CERT HERE //
+//    YOUR CERT HERE    //
 -----END CERTIFICATE-----
 )EOF";
 
-// Your private key for ssl connection over HTTPS (DO NOT use this one)
+// Private key for ssl connection over HTTPS
 static const char serverKey[] PROGMEM =  R"EOF(
 -----BEGIN RSA PRIVATE KEY-----
-    // YOUR KEY HERE //
+//    YOUR CERT HERE    //
 -----END RSA PRIVATE KEY-----
 )EOF";
+
+
+const char telegramRootCert [] PROGMEM = R"CERT(
+-----BEGIN CERTIFICATE-----
+//    YOUR CERT HERE    //
+-----END CERTIFICATE-----
+)CERT";
+
+const char ipSiteRootCert [] PROGMEM = R"CERT(
+-----BEGIN CERTIFICATE-----
+//    YOUR CERT HERE    //
+-----END CERTIFICATE-----
+)CERT";
+
+#endif
 ```
 
 This file should be on the same level as the Esp8266Sketch.ino. If you cloned this repo, the folder structure should look like this:
@@ -73,9 +98,9 @@ qrCodeMaker.py
 
 The 'ssid' and 'password' variables hold your WiFi network name and password respectively. These allow the Esp8266 to connect to your WiFi, enabling it to send the magic packets to any device in that network.
 
-The 'staticIp' makes it so your Esp8266 always has the same ip on your network. This is specially usefull if you're planning to access the web server over the internet via port-forwarding. If you only want to use the web server on your LAN just set the ip to an address currently not used in your network.
+The 'staticIp' makes it so your Esp8266 always has the same ip on your network. This is specially usefull if you're planning to access the web server over the internet via port-forwarding, although you can also configure this from the router using the SoC's MAC address. If you only want to use the web server on your LAN just set the ip to an address currently not used in your network.
 
-To avoid issues when communicating to the internet, the Esp8266 needs to know your routers default local gateway. You can look for tutorials on how to get it by googling "how to get default gateway ip address".
+To avoid issues when communicating to the internet, the Esp8266 needs to know your routers default local gateway. Depending on your OS, you can look for tutorials on how to get it.
 
 The 'hmacKey' is the key used to generate one-time passwords for 2FA. In this repository you can find a python script 'qrCodeMaker.py' that creates your hmacKey hex values and a qr code you can later scan with your prefered authenticator app (Google authenticator, Microsoft authenticator, etc.). You can follow the instructions inside the script so you can replace the hex values into the hmacKey inside the 'envVariables.h' file.
 
