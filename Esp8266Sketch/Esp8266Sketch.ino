@@ -37,7 +37,7 @@ WiFiUDP udp;
 String totpCode = String("");
 
 // Create a new SecureServer instance
-SecureServer secureServer(443, userSessions, hmacKey, udp);
+SecureServer secureServer(443, userSessions, hmacKey, udp, numUSessions);
 
 // Redirects incoming HTTP trafic to the HTTPS server
 void secureRedirect() {
@@ -77,7 +77,7 @@ void setup() {
 void checkSessionTimeouts() {
   unsigned long currentTime = millis();
 
-  for (int i = 0; i < sizeof(secureServer.userSessions) / sizeof(secureServer.userSessions[0]); i++) {
+  for (int i = 0; i < numUSessions; i++) {
     UserSession& session = secureServer.userSessions[i];
 
     if (session.isLoggedIn && currentTime - session.sessionStart > session.lifeTime * 1000) {

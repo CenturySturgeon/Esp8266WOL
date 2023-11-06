@@ -26,16 +26,22 @@ struct UserSession {
 // SecureServer struct holds the ESP8266WebServerSecure, the userSessions, the TOTP object, and the WOL object
 struct SecureServer {
   BearSSL::ESP8266WebServerSecure server;
-  UserSession userSessions[2];
+  UserSession* userSessions;
   TOTP totp;
   WakeOnLan WOL;
 
   // Constructor for SecureServer
-  SecureServer(int serverPort, UserSession *sessions, uint8_t *key, WiFiUDP &udp)
+  SecureServer(int serverPort, UserSession *sessions, uint8_t *key, WiFiUDP &udp, int sessionCount)
     : server(serverPort), totp(key, 10), WOL(udp) {
-    for (int i = 0; i < 2; i++) {
+    userSessions = new UserSession[sessionCount]; // Allocate memory for userSessions
+    for (int i = 0; i < sessionCount; i++) {
       userSessions[i] = sessions[i];
     }
+  }
+
+  // Destructor to release memory
+  ~SecureServer() {
+    delete[] userSessions;
   }
 
   // Simple function to check if a client ip has already an active session
