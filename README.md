@@ -43,9 +43,23 @@ The Esp8266 device loads your credentials, key, and certificates from a file 'en
 #ifndef ENVVARIABLES_H
 #define ENVVARIABLES_H
 
+// Include the types for the user sessions and the ESP8266WiFi.h to use the IPAddress class
+#include "./utils/types.h"
+#include <ESP8266WiFi.h>
+
 // Replace with your network credentials
 const char* ssid = "YOUR_WIFI_NAME";
 const char* password = "YOUR_WIFI_PASSWORD";
+
+// User session array for the handling of session states (default session should be logged out at time 0 with a non-routable IP address)
+// User sessions variables are: Local username, hashed credentials, IP adress, is logged in, session start time, and maximum session duration
+UserSession userSessions[2] = {
+  // 127.0.0.1 corresponds to the loopback address (localhost) and is not routable on the public internet
+  // Hash is admin:admin
+  { "The Admin", "8da193366e1554c08b2870c50f737b9587c3372b656151c4a96028af26f51334", IPAddress(127, 0, 0, 1), false, 0, 60 },
+  // Hash is user:user
+  { "The User", "dc05eb46a46f4645f14bff72c8dfe95e0ba1b1d3d72e189ac2c977a44b7dcaf8", IPAddress(127, 0, 0, 1), false, 0, 60 }
+};
 
 // Set static IP address
 IPAddress staticIP(192, 168, 7, 77);
@@ -109,6 +123,9 @@ qrCodeMaker.py
 ### Generating Requirements
 
 The 'ssid' and 'password' variables hold your WiFi network name and password respectively. These allow the Esp8266 to connect to your WiFi, enabling it to send the magic packets to any device in that network.
+
+The 'userSessions' array holds the credentials for the Esp8266 website. In this array you can specify the hashes for the username and password combination. By default, the hash is generated from a mix of the username and password by joining them with a ':' between them, so the string from which the hash is generated looks like this 'username:password'. This means that the hash for the admin session in the 'envVariables.h' example above, '8da193366e1554c08b2870c50f737b9587c3372b656151c4a96028af26f51334', was generated from the string 'admin:admin' which you can verify in the site https://emn178.github.io/online-tools/sha256.html. 
+The default combination code can be modified to any of your liking on the 'routes.h' file.
 
 The 'staticIp' makes it so your Esp8266 always has the same ip on your network. This is specially usefull if you're planning to access the web server over the internet via port-forwarding. Alternatively, this can be configured from the router using the SoC's MAC address. If you only want to use the web server on your LAN just set the ip to an address currently not used in your network, or disable this feature altogether on the 'wifi_utils.h' file.
 

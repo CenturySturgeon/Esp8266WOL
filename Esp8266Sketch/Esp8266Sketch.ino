@@ -36,18 +36,6 @@ WiFiUDP udp;
 // Initial value for the TOTP code
 String totpCode = String("");
 
-// Maximum lifetime for the sessions in seconds
-unsigned long maxSessionLifeTime = 60;
-
-// User session array for the handling of session states (default should always have no session)
-UserSession userSessions[2] = {
-  // 127.0.0.1 corresponds to the loopback address (localhost) and is not routable on the public internet
-  // Hash is admin:admin
-  { "The Admin", "8da193366e1554c08b2870c50f737b9587c3372b656151c4a96028af26f51334", IPAddress(127, 0, 0, 1), false, 0, maxSessionLifeTime },
-  // Hash is user:user
-  { "The User", "dc05eb46a46f4645f14bff72c8dfe95e0ba1b1d3d72e189ac2c977a44b7dcaf8", IPAddress(127, 0, 0, 1), false, 0, maxSessionLifeTime }
-};
-
 // Create a new SecureServer instance
 SecureServer secureServer(443, userSessions, hmacKey, udp);
 
