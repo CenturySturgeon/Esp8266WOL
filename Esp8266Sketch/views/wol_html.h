@@ -1,5 +1,5 @@
 // wol_html.h
-const char *wol_html = R"EOF(
+const char wol_html[] PROGMEM = R"EOF(
 <!DOCTYPE html>
 <html lang="en">
 <head>

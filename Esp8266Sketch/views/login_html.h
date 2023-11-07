@@ -1,6 +1,6 @@
 // login_html.h
 
-const char* login_html = R"EOF(
+const char login_html[] PROGMEM = R"EOF(
 <!DOCTYPE html>
 <html lang="en">
 <head>

@@ -1,5 +1,5 @@
 // status_html.h
-const char* status_html = R"EOF(
+const char status_html[] PROGMEM = R"EOF(
 <!DOCTYPE html>
 <html lang="en">
 
