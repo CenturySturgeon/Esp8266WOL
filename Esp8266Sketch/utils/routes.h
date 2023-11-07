@@ -7,7 +7,7 @@
 // Import the html files
 #include "../views/wol_html.h"
 #include "../views/login_html.h"
-#include "../views/success_html.h"
+#include "../views/status_html.h"
 
 // Function that returns the SHA256 hash for the provided string
 String calculateSHA256Hash(const String &inputString) {
@@ -52,12 +52,12 @@ void setServerRoutes(SecureServer &secureServer) {
 
   // Success path handler
   secureServer.server.on("/success", HTTP_GET, [&]() {
-    secureServer.server.send(200, "text/html", success_html);
+    secureServer.server.send(200, "text/html", status_html);
   });
 
   // Error path handler
   secureServer.server.on("/error", HTTP_GET, [&]() {
-    secureServer.server.send(200, "text/html", success_html);
+    secureServer.server.send(200, "text/html", status_html);
   });
 
   // Login path handler

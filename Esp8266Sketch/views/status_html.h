@@ -1,5 +1,5 @@
-// success_html.h
-const char* success_html = R"EOF(
+// status_html.h
+const char* status_html = R"EOF(
 <!DOCTYPE html>
 <html lang="en">
 
