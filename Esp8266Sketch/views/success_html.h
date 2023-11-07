@@ -30,11 +30,10 @@ const char* success_html = R"EOF(
             position: relative;
         }
 
-        .checkmark {
+        .mark {
             width: 100px;
             height: 100px;
             border-radius: 50%;
-            background-color: #4CAF50;
             color: #fff;
             display: flex;
             justify-content: center;
@@ -42,28 +41,70 @@ const char* success_html = R"EOF(
             margin: 0 auto 20px;
         }
 
-        .checkmark i {
+        .succes-mark {
+            background-color: #4CAF50;
+        }
+
+        .error-mark {
+            background-color: #FF5733;
+        }
+
+        .mark i {
             font-size: 3em;
         }
 
         h1 {
             color: #333;
         }
+
+        .hidden {
+            display: none;
+        }
+
     </style>
 </head>
 
 <body>
     <div class="container">
-        <div class="checkmark"> <i class="fas fa-check"></i> </div>
+        <div id="success" class="hidden">
+        <div class="mark succes-mark"> <i class="fas fa-check"></i> </div>
         <h1>Success!</h1>
-         <p id="dynamic-message"></p>
+        </div>
+
+        <div id="error"class="hidden">
+        <div class="mark error-mark"> <i class="fas fa-times"></i> </div>
+        <h1>Error</h1>
+        </div>
+
+        <p id="dynamic-message"></p>
     </div>
 </body>
 
-<script>
-  const urlParams = new URLSearchParams(window.location.search);  
-  const dynamicMessage = urlParams.get('message') || '';
-  document.getElementById('dynamic-message').textContent = dynamicMessage;
+<script defer>
+    // Function to check if the URL contains the word "success"
+    function urlContainsSuccess() {
+        return window.location.href.includes("success");
+    }
+
+    // Function to show or hide elements based on the URL
+    function toggleElementsVisibility() {
+        const successClass = document.getElementById('success');
+        const errorClass = document.getElementById('error');
+
+        if (urlContainsSuccess()) {
+            successClass.classList.remove("hidden");
+            errorClass.classList.add("hidden");
+        } else {
+            successClass.classList.add("hidden");
+            errorClass.classList.remove("hidden");
+        }
+    }
+
+    toggleElementsVisibility();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const dynamicMessage = urlParams.get('message') || '';
+    document.getElementById('dynamic-message').textContent = dynamicMessage;
 </script>
 
 </html>

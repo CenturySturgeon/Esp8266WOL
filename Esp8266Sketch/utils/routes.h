@@ -50,8 +50,13 @@ void setServerRoutes(SecureServer &secureServer) {
     }
   });
 
-  // Login path handler
+  // Success path handler
   secureServer.server.on("/success", HTTP_GET, [&]() {
+    secureServer.server.send(200, "text/html", success_html);
+  });
+
+  // Error path handler
+  secureServer.server.on("/error", HTTP_GET, [&]() {
     secureServer.server.send(200, "text/html", success_html);
   });
 
