@@ -107,7 +107,7 @@ void setServerRoutes(SecureServer &secureServer) {
 
     } else {
       secureServer.logout(secureServer.server.client().remoteIP());
-      secureServer.server.send(405, "text/html", "Not Allowed");
+      secureServer.redirectTo("error?message=Not%20Allowed");
     }
   });
 }
