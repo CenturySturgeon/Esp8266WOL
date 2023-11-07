@@ -7,6 +7,7 @@
 // Import the html files
 #include "../views/wol_html.h"
 #include "../views/login_html.h"
+#include "../views/success_html.h"
 
 // Function that returns the SHA256 hash for the provided string
 String calculateSHA256Hash(const String &inputString) {
@@ -50,6 +51,11 @@ void setServerRoutes(SecureServer &secureServer) {
   });
 
   // Login path handler
+  secureServer.server.on("/success", HTTP_GET, [&]() {
+    secureServer.server.send(200, "text/html", success_html);
+  });
+
+  // Login path handler
   secureServer.server.on("/login", HTTP_GET, [&]() {
     if (secureServer.handleAuthentication("")) {
       secureServer.redirectTo("/wol");
@@ -90,7 +96,8 @@ void setServerRoutes(SecureServer &secureServer) {
         secureServer.WOL.sendMagicPacket(macAddress.c_str());  // Convert String to const char *
       }
       // Return success page and logout
-      secureServer.server.send(200, "text/html", "Magic Packet sent to equipment: " + macAddress);
+      macAddress.replace(" ", "%20");
+      secureServer.redirectTo("success?message=Magic%20Packet%20sent%20to%20equipment:%20" + macAddress);
       secureServer.logout(secureServer.server.client().remoteIP());
 
     } else {
