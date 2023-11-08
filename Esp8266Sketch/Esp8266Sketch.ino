@@ -70,6 +70,12 @@ void setup() {
   // Redirect all users using HTTP to the HTTPS server
   serverHTTP.on("/", HTTP_GET, secureRedirect);
 
+  // List of headers (cookies) to be recorded
+  const char * headerkeys[] = {"Esp8266AuthCookie"} ;
+  size_t headerkeyssize = sizeof(headerkeys)/sizeof(char*);
+  //Set the server to track these headers
+  secureServer.server.collectHeaders(headerkeys, headerkeyssize);
+
   secureServer.server.begin();
   serverHTTP.begin();
 }
