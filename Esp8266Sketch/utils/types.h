@@ -92,9 +92,9 @@ struct SecureServer {
   }
 
   // Returns wether or not there's an existing session for the given ip, and also has the ability to create a new session
-  bool handleAuthentication(String credentials) {
+  bool handleAuthentication(String credentials, String token) {
     IPAddress clientIp = server.client().remoteIP();  // Get the client's IP address
-    bool clientAuthenticated = is_authenticated(clientIp);
+    bool clientAuthenticated = is_authenticated(clientIp, token);
     bool goodCredentials = credentialsMatch(credentials);
 
     if (clientAuthenticated) {
