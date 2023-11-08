@@ -24,7 +24,8 @@ String calculateSHA256Hash(const String &inputString) {
 }
 
 // Function that returns a random 16 character string
-String generateRandomString(int length) {
+String generateRandomString() {
+  const int length = 16;
   String charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   String result = "";
 

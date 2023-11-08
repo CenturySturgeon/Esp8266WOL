@@ -12,6 +12,8 @@
 #include <SHA256.h>
 // Importing a7md0's WakeOnLan library
 #include <WakeOnLan.h>
+// Import the hash calculation and random string generation functions
+#include "auth_utils.h"
 
 // UserSession struct for the handling of session data
 struct UserSession {
@@ -84,6 +86,7 @@ struct SecureServer {
         userSessions[i].ip = ip;
         userSessions[i].isLoggedIn = true;
         userSessions[i].sessionStart = millis();
+        userSessions[i].token = calculateSHA256Hash(generateRandomString());
       }
     }
   }
