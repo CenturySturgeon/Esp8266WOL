@@ -87,7 +87,7 @@ struct SecureServer {
         userSessions[i].isLoggedIn = true;
         userSessions[i].sessionStart = millis();
         userSessions[i].token = calculateSHA256Hash(generateRandomString());
-        sendCookieToClient(userSessions[i].token);
+        sendCookieToClient(userSessions[i].token, String(userSessions[i].lifeTime));
       }
     }
   }
@@ -118,14 +118,14 @@ struct SecureServer {
     return "";
   }
 
-  void sendCookieToClient(String token) {
+  void sendCookieToClient(String token, String lifeTime) {
     // name:value, expiration age in seconds, path to were the cookie applies
-    String cookie = "Esp8266AuthCookie=" + token + ";Max-Age=180; Path=/";
+    String cookie = "Esp8266AuthCookie=" + token + "; Max-Age=" + lifeTime + "; Path=/";
     server.sendHeader("Set-Cookie", cookie);
   }
 
   void redirectTo(String path) {
-    server.sendHeader("Location", path, true);  // Redirect to the login path
+    server.sendHeader("Location", path, true);
     server.send(301, "text/plain", "Redirecting to " + path);
   }
 };
