@@ -16,7 +16,7 @@
 void setServerRoutes(SecureServer &secureServer) {
   // Home path handler
   secureServer.server.on("/", HTTP_GET, [&]() {
-    if (secureServer.handleAuthentication("")) {
+    if (secureServer.handleAuthentication("", secureServer.getAuthCookie())) {
       secureServer.redirectTo("/wol");
     } else {
       secureServer.redirectTo("/login");
@@ -25,7 +25,7 @@ void setServerRoutes(SecureServer &secureServer) {
 
   // WOL path handler
   secureServer.server.on("/wol", HTTP_GET, [&]() {
-    if (secureServer.handleAuthentication("")) {
+    if (secureServer.handleAuthentication("", secureServer.getAuthCookie())) {
       secureServer.server.send(200, "text/html", wol_html);
     } else {
       secureServer.redirectTo("/login");
@@ -44,7 +44,7 @@ void setServerRoutes(SecureServer &secureServer) {
 
   // Login path handler
   secureServer.server.on("/login", HTTP_GET, [&]() {
-    if (secureServer.handleAuthentication("")) {
+    if (secureServer.handleAuthentication("", secureServer.getAuthCookie())) {
       secureServer.redirectTo("/wol");
     } else {
       secureServer.server.send(200, "text/html", login_html);
@@ -57,7 +57,7 @@ void setServerRoutes(SecureServer &secureServer) {
     String password = secureServer.server.arg("password").substring(0, 16);
     // Use a mix of the username and the password to create the credentials
     String credentials = calculateSHA256Hash(username + ":" + password);
-    if (secureServer.handleAuthentication(credentials)) {
+    if (secureServer.handleAuthentication(credentials, secureServer.getAuthCookie())) {
       secureServer.redirectTo("/wol");
     } else {
       secureServer.server.send(200, "text/html", login_html);
@@ -72,7 +72,7 @@ void setServerRoutes(SecureServer &secureServer) {
     String pin = secureServer.server.arg("pin").substring(0, 6);
 
     // Check if authenticated and TOTP PIN match using current time (time(nullptr))
-    if (secureServer.handleAuthentication("") && String(secureServer.totp.getCode(time(nullptr))) == pin) {
+    if (secureServer.handleAuthentication("", secureServer.getAuthCookie()) && String(secureServer.totp.getCode(time(nullptr))) == pin) {
 
       // Send magic packet to the equipment
       if (secureOn != "") {
