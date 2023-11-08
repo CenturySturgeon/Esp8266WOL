@@ -46,9 +46,9 @@ struct SecureServer {
   }
 
   // Simple function to check if a client ip has already an active session
-  bool is_authenticated(IPAddress ip) {
+  bool is_authenticated(IPAddress ip, String token) {
     for (int i = 0; i < 2; i++) {
-      if (userSessions[i].ip == ip && userSessions[i].isLoggedIn) {
+      if (userSessions[i].ip == ip && userSessions[i].isLoggedIn && userSessions[i].token != "" && token.indexOf("Esp8266AuthCookie=" + userSessions[i].token) != -1) {
         return true;
       }
     }
