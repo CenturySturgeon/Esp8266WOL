@@ -62,6 +62,7 @@ struct SecureServer {
         userSessions[i].ip = IPAddress(127, 0, 0, 1);
         userSessions[i].isLoggedIn = false;
         userSessions[i].sessionStart = 0;
+        userSessions[i].token = "";
       }
     }
   }
