@@ -109,6 +109,14 @@ struct SecureServer {
     }
   }
 
+  String getAuthCookie() {
+  if (server.hasHeader("Esp8266AuthCookie")) {
+      String cookieHeader = server.header("Esp8266AuthCookie");
+      return cookieHeader;
+  }
+    return "";
+  }
+
   void redirectTo(String path) {
     server.sendHeader("Location", path, true);  // Redirect to the login path
     server.send(301, "text/plain", "Redirecting to " + path);
