@@ -54,14 +54,14 @@ const char* password = "YOUR_WIFI_PASSWORD";
 // Set the number of manageable user sessions (must match with the actual no. of sessions inside the userSessions array)
 const int numUSessions = 2;
 
-// User session array for the handling of session states (default session should be logged out at time 0 with a non-routable IP address)
-// User sessions variables are: Local username, hashed credentials, IP adress, is logged in, session start time, and maximum session duration
+// User session array for the handling of session states (default session should be logged out at time 0, with a non-routable IP address, and an empty token)
+// User sessions variables are: Local username, hashed credentials, IP adress, is logged in, authentication token, session start time, and maximum session duration
 UserSession userSessions[numUSessions] = {
   // 127.0.0.1 corresponds to the loopback address (localhost) and is not routable on the public internet
   // Hash is admin:admin
-  { "The Admin", "8da193366e1554c08b2870c50f737b9587c3372b656151c4a96028af26f51334", IPAddress(127, 0, 0, 1), false, 0, 60 },
+  { "The Admin", "8da193366e1554c08b2870c50f737b9587c3372b656151c4a96028af26f51334", IPAddress(127, 0, 0, 1), false, "", 0, 60 },
   // Hash is user:user
-  { "The User", "dc05eb46a46f4645f14bff72c8dfe95e0ba1b1d3d72e189ac2c977a44b7dcaf8", IPAddress(127, 0, 0, 1), false, 0, 60 }
+  { "The User", "dc05eb46a46f4645f14bff72c8dfe95e0ba1b1d3d72e189ac2c977a44b7dcaf8", IPAddress(127, 0, 0, 1), false, "", 0, 60 }
 };
 
 // Set static IP address
