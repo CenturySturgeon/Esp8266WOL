@@ -30,7 +30,11 @@ On login submission, the created hash is created from a mix of the username plus
 calculateSHA256Hash(username:password);
 ```
 
-You can modify this hash generation combination on the 'routes.h' file on line 66 'String credentials = calculateSHA256Hash(username + ":" + password);' although I'd recommend that your hashes remain some kind of mix of the username and password.
+You can modify this hash generation combination on the 'routes.h' file on line 66, although I'd recommend that your hashes remain some kind of mix of the username and password.
+
+```
+String credentials = calculateSHA256Hash(username + ":" + password);
+```
 
 You can read more about the WOL library used in this code at https://github.com/a7md0/WakeOnLan.
 
