@@ -37,7 +37,7 @@ WiFiUDP udp;
 String totpCode = String("");
 
 // Create a new SecureServer instance
-SecureServer secureServer(443, userSessions, hmacKey, udp, numUSessions);
+SecureServer secureServer(443, userSessions, udp, numUSessions);
 
 // Redirects incoming HTTP trafic to the HTTPS server
 void secureRedirect() {
