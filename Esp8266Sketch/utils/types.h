@@ -21,6 +21,7 @@ struct UserSession {
   String credentials;  // Hash that holds the session credentials (a mix of your username and password)
   IPAddress ip;
   bool isLoggedIn;
+  uint8_t hmacKey[10];  // Key to generate TOTP tokens
   String token; // Token to validate the client's session identity alongside the IP
   unsigned long sessionStart;  // Time of the session begining in milliseconds
   unsigned long lifeTime;      // Maximum session lifetime in seconds
