@@ -31,12 +31,11 @@ struct UserSession {
 struct SecureServer {
   BearSSL::ESP8266WebServerSecure server;
   UserSession* userSessions;
-  TOTP totp;
   WakeOnLan WOL;
 
   // Constructor for SecureServer
-  SecureServer(int serverPort, UserSession *sessions, uint8_t *key, WiFiUDP &udp, int sessionCount)
-    : server(serverPort), totp(key, 10), WOL(udp) {
+  SecureServer(int serverPort, UserSession *sessions, WiFiUDP &udp, int sessionCount)
+    : server(serverPort), WOL(udp) {
     userSessions = new UserSession[sessionCount]; // Allocate memory for userSessions
     for (int i = 0; i < sessionCount; i++) {
       userSessions[i] = sessions[i];
@@ -112,11 +111,10 @@ struct SecureServer {
   }
 
   bool isPinValid(String pin){
-    TOTP totp;
-    IPAddress clientIp = server.client().remoteIP();  // Get the client's IP address
+    IPAddress clientIp = server.client().remoteIP();
     for (int i = 0; i < 2; i++) {
       if (userSessions[i].ip == clientIp) {
-        return totp(userSessions[i].hmacKey, 10).getCode(time(nullptr));
+        return String(TOTP(userSessions[i].hmacKey, 10).getCode(time(nullptr))) == pin;
       }
     }
     return false;
