@@ -72,7 +72,7 @@ void setServerRoutes(SecureServer &secureServer) {
     String pin = secureServer.server.arg("pin").substring(0, 6);
 
     // Check if authenticated and TOTP PIN match using current time (time(nullptr))
-    if (secureServer.handleAuthentication("", secureServer.getAuthCookie()) && String(secureServer.totp.getCode(time(nullptr))) == pin) {
+    if (secureServer.handleAuthentication("", secureServer.getAuthCookie()) && secureServer.isPinValid(pin)) {
 
       // Send magic packet to the equipment
       if (secureOn != "") {
