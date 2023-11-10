@@ -58,14 +58,13 @@ const char* password = "YOUR_WIFI_PASSWORD";
 // Set the number of manageable user sessions (must match with the actual no. of sessions inside the userSessions array)
 const int numUSessions = 2;
 
-// User session array for the handling of session states (default session should be logged out at time 0, with a non-routable IP address, and an empty token)
-// User sessions variables are: Local username, hashed credentials, IP adress, is logged in, authentication token, session start time, and maximum session duration
+// User session array for the handling of session states
+// User sessions variables are: Local username, hashed credentials, hmackey (for TOTP), and maximum session duration in seconds
 UserSession userSessions[numUSessions] = {
-  // 127.0.0.1 corresponds to the loopback address (localhost) and is not routable on the public internet
-  // Hash is admin:admin
-  { "The Admin", "8da193366e1554c08b2870c50f737b9587c3372b656151c4a96028af26f51334", IPAddress(127, 0, 0, 1), false, "", 0, 60 },
+  // Hash is made from the string "admin:admin" (the username is "admin" and the password is "admin" as well)
+  { "The Admin", "8da193366e1554c08b2870c50f737b9587c3372b656151c4a96028af26f51334", { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, 60},
   // Hash is user:user
-  { "The User", "dc05eb46a46f4645f14bff72c8dfe95e0ba1b1d3d72e189ac2c977a44b7dcaf8", IPAddress(127, 0, 0, 1), false, "", 0, 60 }
+  { "The User", "dc05eb46a46f4645f14bff72c8dfe95e0ba1b1d3d72e189ac2c977a44b7dcaf8", { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, 60}
 };
 
 // Set static IP address
@@ -74,9 +73,6 @@ IPAddress staticIP(192, 168, 7, 77);
 IPAddress gateway(192, 168, 8, 88);
 // Set your subnet (the default one should probably work)
 IPAddress subnet(255, 255, 255, 0);
-
-// Set the hmacKey for TOTP generation
-uint8_t hmacKey[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 
 // Set your telegram bot API token
 String BOT_TOKEN = "XXXXXXXXXX:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
@@ -142,7 +138,7 @@ To avoid issues when communicating to the internet, the Esp8266 needs to know yo
 
 The 'BOT_TOKEN' and 'CHAT_ID' variables store information regarding your telegram bot. This is usefull if you're planning to access your SoC's website from outside the LAN since you'll need the public IP from your router. This code makes it so that the Esp8266 sends you the public IP upon startup and keeps looking for changes in the public IP every hour (you can change this on the wifi_utils.h file) to re-send it if it changed, all of this via your telegram bot.
 
-The 'hmacKey' is the key used to generate one-time passwords for 2FA. In this repository you can find a python script 'qrCodeMaker.py' that creates your hmacKey hex values and a qr code you can later scan with your prefered authenticator app (Google authenticator, Microsoft authenticator, etc.). You can follow the instructions inside the script so you can replace the hex values into the hmacKey inside the 'envVariables.h' file.
+Each user session holds an 'hmacKey', which is the key used to generate one-time passwords for 2FA. In this repository you can find a python script 'qrCodeMaker.py' that creates your hmacKey hex values and a qr code you can later scan with your prefered authenticator app (Google authenticator, Microsoft authenticator, etc.). You can follow the instructions inside the script so you can replace the hex values into the hmacKey inside the 'envVariables.h' file.
 
 The 'telegramRootCert' and 'ipSiteRootCert' are certificates from the telegram API webiste and the site used to get the public ip (api.ipify.org is the default, although you can change it on the wifi_utils.h file). This certificates are important since the SoC needs to verify the identity of these sites in order to avoid sending (when sending messages to the telegram bot) or receiving (when receiving the public IP) tampered information.
 
