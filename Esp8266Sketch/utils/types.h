@@ -111,6 +111,17 @@ struct SecureServer {
     }
   }
 
+  bool isPinValid(String pin){
+    TOTP totp;
+    IPAddress clientIp = server.client().remoteIP();  // Get the client's IP address
+    for (int i = 0; i < 2; i++) {
+      if (userSessions[i].ip == clientIp) {
+        return totp(userSessions[i].hmacKey, 10).getCode(time(nullptr));
+      }
+    }
+    return false;
+  }
+
   String getAuthCookie() {
   if (server.hasHeader("Cookie")) {
       String cookieHeader = server.header("Cookie");
