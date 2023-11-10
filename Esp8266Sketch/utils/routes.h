@@ -83,8 +83,7 @@ void setServerRoutes(SecureServer &secureServer) {
         secureServer.WOL.sendMagicPacket(macAddress.c_str());  // Convert String to const char *
       }
       // Return success page and logout
-      macAddress.replace(" ", "%20");
-      secureServer.redirectTo("success?message=Magic%20Packet%20sent%20to%20equipment:%20" + macAddress);
+      secureServer.redirectTo("success?message=Magic%20Packet%20sent%20to%20equipment.");
       secureServer.logout(secureServer.server.client().remoteIP());
 
     } else {
