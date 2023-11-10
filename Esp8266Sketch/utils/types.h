@@ -19,12 +19,12 @@
 struct UserSession {
   String localUName;   // Holds a local username (doesn't need to match the credential's) for easier, human readable tracking
   String credentials;  // Hash that holds the session credentials (a mix of your username and password)
+  uint8_t hmacKey[10];  // Key to generate TOTP tokens
+  unsigned long lifeTime;      // Maximum session lifetime in seconds
   IPAddress ip;
   bool isLoggedIn;
-  uint8_t hmacKey[10];  // Key to generate TOTP tokens
   String token; // Token to validate the client's session identity alongside the IP
   unsigned long sessionStart;  // Time of the session begining in milliseconds
-  unsigned long lifeTime;      // Maximum session lifetime in seconds
 };
 
 // SecureServer struct holds the ESP8266WebServerSecure, the userSessions, the TOTP object, and the WOL object
