@@ -30,12 +30,13 @@ struct UserSession {
 // SecureServer struct holds the ESP8266WebServerSecure, the userSessions, the TOTP object, and the WOL object
 struct SecureServer {
   BearSSL::ESP8266WebServerSecure server;
+  int sessionCount;
   UserSession* userSessions;
   WakeOnLan WOL;
 
   // Constructor for SecureServer
-  SecureServer(int serverPort, UserSession *sessions, WiFiUDP &udp, int sessionCount)
-    : server(serverPort), WOL(udp) {
+  SecureServer(int serverPort, UserSession *sessions, WiFiUDP &udp, int numUSessions)
+    : server(serverPort), WOL(udp), sessionCount(numUSessions) {
     userSessions = new UserSession[sessionCount]; // Allocate memory for userSessions
     for (int i = 0; i < sessionCount; i++) {
       userSessions[i] = sessions[i];
@@ -49,7 +50,7 @@ struct SecureServer {
 
   // Simple function to check if a client ip has already an active session
   bool is_authenticated(IPAddress ip, String token) {
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < sessionCount; i++) {
       if (userSessions[i].ip == ip && userSessions[i].isLoggedIn && userSessions[i].token != "" && token.indexOf("Esp8266AuthCookie=" + userSessions[i].token) != -1) {
         return true;
       }
@@ -59,7 +60,7 @@ struct SecureServer {
 
   // Handles the logout of a session for an ip
   void logout(IPAddress ip) {
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < sessionCount; i++) {
       if (userSessions[i].ip == ip) {
         userSessions[i].ip = IPAddress(127, 0, 0, 1);
         userSessions[i].isLoggedIn = false;
@@ -71,7 +72,7 @@ struct SecureServer {
 
   // Simple function that checks the provided credentials match with the credentials on the sessions array
   bool credentialsMatch(String credentials) {
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < sessionCount; i++) {
       if (userSessions[i].credentials == credentials) {
         return true;
       }
@@ -81,7 +82,7 @@ struct SecureServer {
 
   // Assigns the ip a session to the provided user name
   void assignSession(String credentials, IPAddress ip) {
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < sessionCount; i++) {
       if (userSessions[i].credentials == credentials) {
         userSessions[i].ip = ip;
         userSessions[i].isLoggedIn = true;
@@ -112,7 +113,7 @@ struct SecureServer {
 
   bool isPinValid(String pin){
     IPAddress clientIp = server.client().remoteIP();
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < sessionCount; i++) {
       if (userSessions[i].ip == clientIp) {
         return String(TOTP(userSessions[i].hmacKey, 10).getCode(time(nullptr))) == pin;
       }
