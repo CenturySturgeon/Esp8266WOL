@@ -38,7 +38,7 @@ String credentials = calculateSHA256Hash(username + ":" + password);
 
 You can read more about the WOL library used in this code at https://github.com/a7md0/WakeOnLan.
 
-### Requirements
+## Requirements
 
 The Esp8266 device loads your credentials, key, and certificates from a file 'envVariables.h' that should look like this:
 
@@ -123,26 +123,44 @@ Esp8266Sketch/
 qrCodeMaker.py
 ```
 
-### Generating Requirements
+## Generating Requirements
 
-The 'ssid' and 'password' variables hold your WiFi network name and password respectively. These allow the Esp8266 to connect to your WiFi, enabling it to send the magic packets to any device in that network.
+### SSID & Password
 
-The 'numUSessions' variable defines the total amount of manageable user sessions available. It must match with the number of sessions inside the 'userSessions' array or out of bounds errors and improper session validations may occur. Note that this variable should not be deleted as it is used in other parts of the code.
+These variables hold your WiFi network name and password respectively. These allow the Esp8266 to connect to your WiFi, enabling it to send the magic packets to any device in that network.
 
-The 'userSessions' array holds the credentials for the Esp8266 website. In this array you can specify the hashes for the username and password combination for everyone intended to have access. By default, the hash is generated from a mix of the username and password by joining them with a ":" character between them, so the string from which the hash is generated looks like this "username:password".
+### NumUSessions
+
+Defines the total amount of manageable user sessions available. It must match with the number of sessions inside the 'userSessions' array or out of bounds errors and improper session validations may occur. Note that this variable should not be deleted as it is used in other parts of the code.
+
+### UserSessions
+
+This array holds the credentials for the Esp8266 website. In this array, you can specify the hashes for the username and password combination for everyone intended to have access. By default, the hash is generated from a mix of the username and password by joining them with a ":" character between them, so the string from which the hash is generated looks like this "username:password".
 This means that the hash for the admin session in the 'envVariables.h' example above, "8da193366e1554c08b2870c50f737b9587c3372b656151c4a96028af26f51334", was generated from the string "admin:admin" which you can verify in the site https://emn178.github.io/online-tools/sha256.html. The default combination code can be modified to any of your liking on the 'routes.h' file.
 
-The 'staticIp' makes it so your Esp8266 always has the same ip on your network. This is specially usefull if you're planning to access the web server over the internet via port-forwarding. Alternatively, this can be configured from the router using the SoC's MAC address. If you only want to use the web server on your LAN just set the ip to an address currently not used in your network, or disable this feature altogether on the 'wifi_utils.h' file.
+### StaticIP
+
+Makes it so your Esp8266 always has the same ip on your network. This is specially usefull if you're planning to access the web server over the internet via port-forwarding. Alternatively, this can be configured from the router using the SoC's MAC address. If you only want to use the web server on your LAN just set the ip to an address currently not used in your network, or disable this feature altogether.
+
+### Gateway
 
 To avoid issues when communicating to the internet, the Esp8266 needs to know your routers default local gateway and store it in the 'gateway' variable. Depending on your OS, you can look for tutorials on how to get it.
 
-The 'BOT_TOKEN' and 'CHAT_ID' variables store information regarding your telegram bot. This is usefull if you're planning to access your SoC's website from outside the LAN since you'll need the public IP from your router. This code makes it so that the Esp8266 sends you the public IP upon startup and keeps looking for changes in the public IP every hour (you can change this on the wifi_utils.h file) to re-send it if it changed, all of this via your telegram bot.
+### BOT_TOKEN & CHAT_ID
+
+These variables store information regarding your telegram bot. This is usefull if you're planning to access your SoC's website from outside the LAN since you'll need the public IP from your router. This code makes it so that the Esp8266 sends you the public IP upon startup and keeps looking for changes in the public IP every hour (you can change the interval on the wifi_utils.h file), re-sends it if it changed, all of this via your telegram bot.
+
+### HmacKey
 
 Each user session holds an 'hmacKey', which is the key used to generate one-time passwords for 2FA. In this repository you can find a python script 'qrCodeMaker.py' that creates your hmacKey hex values and a qr code you can later scan with your prefered authenticator app (Google authenticator, Microsoft authenticator, etc.). You can follow the instructions inside the script so you can replace the hex values into the hmacKey inside the 'envVariables.h' file.
 
-The 'telegramRootCert' and 'ipSiteRootCert' are certificates from the telegram API webiste and the site used to get the public ip (api.ipify.org is the default, although you can change it on the wifi_utils.h file). This certificates are important since the SoC needs to verify the identity of these sites in order to avoid sending (when sending messages to the telegram bot) or receiving (when receiving the public IP) tampered information.
+### TelegramRootCert & IPSiteRootCert
 
-Finally, the private key 'serverKey' and the ssl certificate 'serverCert'. These certificate and private key are used to create a secure connection over HTTPS for the SoC's website. To generate them you can use the following commands:
+These are certificates from the telegram API webiste and the site used to get the public ip (api.ipify.org is the default, you can change it on the wifi_utils.h file). This certificates are important since the SoC needs to verify the identity of these sites in order to avoid sending (when posting messages to the telegram bot) or receiving (when retrieving the public IP) tampered information.
+
+### ServerCert & ServerKey
+
+The certificate and private key that are used to create a secure connection over HTTPS for the SoC's website. To generate them you can use the following commands:
 
 ```
 openssl genrsa -out key.txt 1024
@@ -155,12 +173,13 @@ openssl x509 -req -sha256 -days 365 -in cert.csr -signkey key.txt -out cert.txt
 ```
 
 Once you run these commands you can get the certificate and key from the .txt files. But before you create the ceritificate and the private key, you need to understand the commands variable names and their meaning:
-
-    C  - Country (abreviated)
-    ST - State or province
-    L  - Locality or city
-    O  - Organization
-    OU - Organizational unit
-    CN - Common name (domain name)
+```
+C  - Country (abreviated)
+ST - State or province
+L  - Locality or city
+O  - Organization
+OU - Organizational unit
+CN - Common name (domain name)
+```
 
 The subjectAltName parameter must contain the domain name(s) where your server is accessible. It can specify also IP addresses like this: 'subjectAltName=DNS:esp8266.local,IP:192.168.7.77'.
