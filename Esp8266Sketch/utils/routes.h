@@ -6,11 +6,14 @@
 
 // Import the hash calculation function
 #include "auth_utils.h"
+// Import the publicIp variable
+#include "wifi_utils.h"
 
 // Import the html files
 #include "../views/wol_html.h"
 #include "../views/login_html.h"
 #include "../views/status_html.h"
+#include "../views/copyIp_html.h"
 
 // Sets the path handlers for the server variable inputed
 void setServerRoutes(SecureServer &secureServer) {
@@ -40,6 +43,14 @@ void setServerRoutes(SecureServer &secureServer) {
   // Error path handler
   secureServer.server.on("/error", HTTP_GET, [&]() {
     secureServer.server.send(200, "text/html", status_html);
+  });
+
+  // Copy ip page path handlers
+  secureServer.server.on("/publicIp", HTTP_GET, [&]() {
+    secureServer.redirectTo("/copyIp?ip=" + publicIp);
+  });
+  secureServer.server.on("/copyIp", HTTP_GET, [&]() {
+    secureServer.server.send(200, "text/html", copyIp_html);
   });
 
   // Login path handler
