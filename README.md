@@ -67,6 +67,8 @@ UserSession userSessions[numUSessions] = {
   { "The User", "dc05eb46a46f4645f14bff72c8dfe95e0ba1b1d3d72e189ac2c977a44b7dcaf8", { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, 60}
 };
 
+NOTE: Each user session has its own hmacKey, represented in the example above by the values inside the keys "{ 0xFF, 0xFF, ... 0xFF}". You can read more about this in the "Generating Requirements" section below.
+
 // Set static IP address
 IPAddress staticIP(192, 168, 7, 77);
 // Get the default local gateway from your router
@@ -152,7 +154,7 @@ These variables store information regarding your telegram bot. This is usefull i
 
 ### HmacKey
 
-Each user session holds an 'hmacKey', which is the key used to generate one-time passwords for 2FA. In this repository you can find a python script 'qrCodeMaker.py' that creates your hmacKey hex values and a qr code you can later scan with your prefered authenticator app (Google authenticator, Microsoft authenticator, etc.). You can follow the instructions inside the script so you can replace the hex values into the hmacKey inside the 'envVariables.h' file.
+Each user session holds an 'hmacKey', which is the key used to generate one-time passwords for 2FA. In this repository you can find a python script 'qrCodeMaker.py' that creates your hmacKey hex values and a qr code you can later scan with your prefered authenticator app (Google authenticator, Microsoft authenticator, etc.). You can follow the instructions inside the script so you can replace the hex values into the hmacKey for each user session in the 'envVariables.h' file.
 
 ### TelegramRootCert & IPSiteRootCert
 
@@ -160,17 +162,21 @@ These are certificates from the telegram API webiste and the site used to get th
 
 ### ServerCert & ServerKey
 
-The certificate and private key that are used to create a secure connection over HTTPS for the SoC's website. To generate them you can use the following commands:
+The certificate and private key that are used to create a secure connection over HTTPS for the SoC's website. To generate them you can use the following commands (in Windows, don't forget to run the terminal as an administrator):
 
 ```
-openssl genrsa -out key.txt 1024
+openssl
 
-openssl rsa -in key.txt -out key.txt
+genrsa -out key.txt 1024
 
-openssl req -sha256 -new -nodes -key key.txt -out cert.csr -subj '/C=XX/ST=XX/L=XX/O=XX [RO]/OU=XX/CN=esp8266.local' -addext subjectAltName=DNS:esp8266.local
+rsa -in key.txt -out key.txt
 
-openssl x509 -req -sha256 -days 365 -in cert.csr -signkey key.txt -out cert.txt
+req -sha256 -new -nodes -key key.txt -out cert.csr -subj '/C=XX/ST=XX/L=XX/O=XX [RO]/OU=XX/CN=esp8266.local' -addext subjectAltName=DNS:esp8266.local
+
+x509 -req -sha256 -days 365 -in cert.csr -signkey key.txt -out cert.txt
 ```
+
+NOTE: The first command "openssl" will spawn an interactive open ssl terminal where each line will begin with the prefix "OpenSSL>". Once you see the prefix, you can run the remaining commands, otherwise they will not work.
 
 Once you run these commands you can get the certificate and key from the .txt files. But before you create the ceritificate and the private key, you need to understand the commands variable names and their meaning:
 ```
