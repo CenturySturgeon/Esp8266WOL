@@ -6,7 +6,7 @@ from PIL import Image
 ### The purpose of this script is to generate a qr code readable by authenticator apps to generate One Time Passwords
 ### Alternatively, you can directly use the secret_key on the authenticator app and just use the hmackey output for the arduino code
 
-# Replace this with your secret key (16 characters string composed of A-Z and 2-7)
+# Replace this with your secret key (16 characters string composed of A-Z and 2-7). You can generate a random one using the randomSecretKey.py file.
 secret_key = "YOUR_SECRET_KEY"
 
 # Replace this with your desired label (e.g., "MyAccount" or the account name)

@@ -22,7 +22,7 @@ openssl s_client -connect api.telegram.org:443
 
 Even though the essential custom variables are found on the 'envVariables.h' file, on the 'wifi_utils.h' file you'll find aditional customizable variables you can modify, like the DNS server used, the site where the SoC gets the public IP, the NTP server to synch the time with, the time interval to check for public IP changes and more.
 
-The Crypto library is used to safekeep passwords as SHA-256 encrypted hashes and not in plain text. You can install this library directly from the Arduino IDE, it's the one from Rhys Weatherly, more of this in the github repo https://github.com/rweather/arduinolibs. To generate your hashes, you can use online tools like https://emn178.github.io/online-tools/sha256.html or use the library and print them to serial for later use.
+The Crypto library is used to safekeep passwords as SHA-256 encrypted hashes and not in plain text. You can install this library directly from the Arduino IDE, it's the one from Rhys Weatherly, more of this in the github repo https://github.com/rweather/arduinolibs. To generate your hashes, you can use the hash256Generator.py file.
 
 On login submission, the created hash is created from a mix of the username plus the ":" character and the password. which ends up looking like this:
 
