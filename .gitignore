@@ -1,8 +1,5 @@
-qrcode.png
 envVariables.h
-test.html
 *.png
 *.env
-ignore/
 .venv
 __pycache__
