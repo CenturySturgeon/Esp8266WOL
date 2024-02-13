@@ -27,7 +27,7 @@ def get_certificate(hostname: str, port: int = 443) -> tuple[str, Dict | None]:
 ############################################# X509 Certificate & Private Key #############################################
 # For more info on how to create an X509 self signed certificate visit https://cryptography.io/en/latest/x509/
 
-def create_private_key(size = 2048):
+def create_private_key(size: int = 2048):
     """Creates and returns a private key of the specified size. -> RSAPrivateKey"""
     private_key = rsa.generate_private_key(
         public_exponent=65537,
@@ -37,7 +37,20 @@ def create_private_key(size = 2048):
     return private_key
 
 def create_certificate(private_key_size: int, country_name: str, state_or_province_name: str, locality_name: str, organization_name: str, common_name: str, cert_validity_days: int = 365) -> tuple[bytes, bytes]:
+    """
+    Returns an X509 certificate and private key.
+    
+    Params:
+        private_key_size (int): The size for the key in bits.
+        country_name (str): The name of the country for the certificate.
+        state_or_province_name (str): The name of the state or province for the certificate.
+        locality_name (str): The name of the city for the certificate.
+        organization_name (str): The name of the organization for the certificate.
+        cert_validity_days (int): How many days for the certificate to expire since its creation.
 
+    Returns
+        tuple(bytes, bytes): Returns the certificate and key in bytes objects. 
+    """
     # Generate a private key
     private_key = create_private_key(private_key_size)
 
@@ -88,8 +101,8 @@ def create_certificate(private_key_size: int, country_name: str, state_or_provin
     )
 
     # Print or save the certificate and private key to files
-    print(certificate_pem.decode())
-    print(private_key_pem.decode())
+    # print(certificate_pem.decode())
+    # print(private_key_pem.decode())
 
     return (certificate_pem, private_key_pem)
 
