@@ -36,7 +36,7 @@ def create_private_key(size = 2048):
     )
     return private_key
 
-def create_certificate(private_key_size: int, country_name: str, state_or_province_name: str, locality_name: str, organization_name: str, common_name: str, cert_validity_days: int = 365):
+def create_certificate(private_key_size: int, country_name: str, state_or_province_name: str, locality_name: str, organization_name: str, common_name: str, cert_validity_days: int = 365) -> tuple[bytes, bytes]:
 
     # Generate a private key
     private_key = create_private_key(private_key_size)
@@ -91,8 +91,11 @@ def create_certificate(private_key_size: int, country_name: str, state_or_provin
     print(certificate_pem.decode())
     print(private_key_pem.decode())
 
+    return (certificate_pem, private_key_pem)
+
+def save_cert_and_key(cert: bytes, key: bytes, cert_name: str, key_name: str, file_extension=".pem"):
     # Save to files
-    # with open("certificate.pem", "wb") as f:
-    #     f.write(certificate_pem)
-    # with open("private_key.pem", "wb") as f:
-    #     f.write(private_key_pem)
+    with open(cert_name + file_extension, "wb") as f:
+        f.write(cert)
+    with open(key_name  + file_extension, "wb") as f:
+        f.write(key)
