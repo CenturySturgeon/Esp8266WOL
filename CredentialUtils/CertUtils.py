@@ -36,7 +36,7 @@ def create_private_key(size: int = 2048):
     )
     return private_key
 
-def create_certificate(private_key_size: int, country_name: str, state_or_province_name: str, locality_name: str, organization_name: str, common_name: str, cert_validity_days: int = 365) -> tuple[bytes, bytes]:
+def create_certificate_and_private_key(private_key_size: int, country_name: str, state_or_province_name: str, locality_name: str, organization_name: str, common_name: str, cert_validity_days: int = 365) -> tuple[bytes, bytes]:
     """
     Returns an X509 certificate and private key.
     
