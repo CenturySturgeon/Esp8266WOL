@@ -3,3 +3,4 @@ envVariables.h
 test.html
 *.png
 ignore/
+.venv
