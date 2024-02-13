@@ -24,7 +24,7 @@ class UserSession:
         self.uname = user_name
         self.timeout = str(session_timeout)
         self.pin = self.get_random_pin_Code()
-        self.hashedPin = self.generate_sha256_hash(self.uname + ":" + self.pin)
+        self.accessHash = self.generate_sha256_hash(self.uname + ":" + self.pin)
         self.hmacKey = self.create_qr_code(self.uname, totp_label, totp_issuer)
     
     def generate_sha256_hash(self, input_string: str) -> str:
@@ -86,3 +86,7 @@ class UserSession:
         img.save(user_name + ".png")
 
         return hmac_key
+
+    def toString(self):
+        """Returns the user session values as a string inside brackets '{}'."""
+        return f'{{"{self.uname}", "{self.accessHash}", {{ {self.hmacKey} }}, {self.timeout}}}'
