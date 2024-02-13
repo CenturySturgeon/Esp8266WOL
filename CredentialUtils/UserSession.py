@@ -9,7 +9,7 @@ import hashlib
 class UserSession:
     def __init__(self, user_name: str, session_timeout: int, totp_label: str ='MyAccount', totp_issuer: str ="YourIssuer"):
         """
-        Creates an UserSession object that stores the randomly created credentials for the Esp8266.
+        Creates an UserSession object, that stores the randomly created credentials for the Esp8266, and its TOTP QR code.
         
         Params:
             user_name (str): The usersname for this session (also the name that its QR code .png image will have).
@@ -27,7 +27,7 @@ class UserSession:
         self.hashedPin = self.generate_sha256_hash(self.uname + ":" + self.pin)
         self.hmacKey = self.create_qr_code(self.uname, totp_label, totp_issuer)
     
-    def generate_sha256_hash(input_string: str) -> str:
+    def generate_sha256_hash(self, input_string: str) -> str:
         """
         Returns the sha256 hash for the received input string.
         
@@ -40,13 +40,13 @@ class UserSession:
         sha256_hash = hashlib.sha256(input_string.encode()).hexdigest()
         return sha256_hash
 
-    def get_random_pin_Code() -> str:
+    def get_random_pin_Code(self) -> str:
         """Returns a random four digit code."""
         chars = string.digits
         pin =  ''.join(random.choice(chars) for _ in range(4))
         return pin
 
-    def get_random_secret_key() -> str:
+    def get_random_secret_key(self) -> str:
         """Returns a random secret key consisting of random A-Z characters and numbers from 2-8."""
         characters = string.ascii_uppercase + ''.join(str(i) for i in range(2, 8))
         return ''.join(random.choice(characters) for _ in range(16))
