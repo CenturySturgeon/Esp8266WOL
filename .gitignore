@@ -4,3 +4,4 @@ test.html
 *.png
 ignore/
 .venv
+__pycache__
