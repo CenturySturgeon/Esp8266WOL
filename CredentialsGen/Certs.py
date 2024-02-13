@@ -1,8 +1,16 @@
 import ssl
 import socket
 from typing import Dict
+from cryptography import x509
+from cryptography.x509.oid import NameOID
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import serialization
+import datetime
 
 def get_certificate_data(hostname: str, port: int = 443) -> Dict | None:
+    """Gets the certificate details of the provided website and returns it as a dictionary."""
     context = ssl.create_default_context()
     with socket.create_connection((hostname, port)) as sock:
         with context.wrap_socket(sock, server_hostname=hostname) as sslsock:
@@ -10,6 +18,81 @@ def get_certificate_data(hostname: str, port: int = 443) -> Dict | None:
             return certificate
 
 def get_certificate(hostname: str, port: int = 443) -> tuple[str, Dict | None]:
+    """Gets the certificate and its data of the specified website."""
     cert = ssl.get_server_certificate((hostname, 443))
     certData = get_certificate_data(hostname, port)
     return (cert, certData)
+
+
+############################################# X509 Certificate & Private Key #############################################
+# For more info on how to create an X509 self signed certificate visit https://cryptography.io/en/latest/x509/
+
+def create_private_key(size = 2048):
+    """Creates and returns a private key of the specified size. -> RSAPrivateKey"""
+    private_key = rsa.generate_private_key(
+        public_exponent=65537,
+        key_size=size,
+        backend=default_backend()
+    )
+    return private_key
+
+def create_certificate(private_key_size: int, country_name: str, state_or_province_name: str, locality_name: str, organization_name: str, common_name: str, cert_validity_days: int = 365):
+
+    # Generate a private key
+    private_key = create_private_key(private_key_size)
+
+    # Create a subject for the certificate using the variables
+    subject = x509.Name([
+        x509.NameAttribute(NameOID.COUNTRY_NAME, country_name),
+        x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, state_or_province_name),
+        x509.NameAttribute(NameOID.LOCALITY_NAME, locality_name),
+        x509.NameAttribute(NameOID.ORGANIZATION_NAME, organization_name),
+        x509.NameAttribute(NameOID.COMMON_NAME, common_name),
+    ])
+
+
+    # Set certificate validity
+    validity_period = datetime.timedelta(days=cert_validity_days)
+    now = datetime.datetime.utcnow()
+    not_valid_before = now
+    not_valid_after = now + validity_period
+
+    # Create a self-signed certificate
+    builder = (
+        x509.CertificateBuilder()
+        .subject_name(subject)
+        .issuer_name(subject)
+        .public_key(private_key.public_key())
+        .serial_number(x509.random_serial_number())
+        .not_valid_before(not_valid_before)
+        .not_valid_after(not_valid_after)
+    )
+
+    # Sign the certificate with the private key
+    certificate = builder.sign(
+        private_key=private_key,
+        algorithm=hashes.SHA256(),
+        backend=default_backend()
+    )
+
+    # Serialize the certificate to PEM format
+    certificate_pem = certificate.public_bytes(
+        encoding=serialization.Encoding.PEM
+    )
+
+    # Serialize the private key to PEM format
+    private_key_pem = private_key.private_bytes(
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PrivateFormat.TraditionalOpenSSL,
+        encryption_algorithm=serialization.NoEncryption()
+    )
+
+    # Print or save the certificate and private key to files
+    print(certificate_pem.decode())
+    print(private_key_pem.decode())
+
+    # Save to files
+    # with open("certificate.pem", "wb") as f:
+    #     f.write(certificate_pem)
+    # with open("private_key.pem", "wb") as f:
+    #     f.write(private_key_pem)
