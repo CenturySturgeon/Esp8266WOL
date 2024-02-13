@@ -9,7 +9,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 import datetime
 
-def get_certificate_data(hostname: str, port: int = 443) -> Dict | None:
+def __get_certificate_data(hostname: str, port: int = 443) -> Dict | None:
     """Gets the certificate details of the provided website and returns it as a dictionary."""
     context = ssl.create_default_context()
     with socket.create_connection((hostname, port)) as sock:
@@ -20,7 +20,7 @@ def get_certificate_data(hostname: str, port: int = 443) -> Dict | None:
 def get_certificate(hostname: str, port: int = 443) -> tuple[str, Dict | None]:
     """Gets the certificate and its data of the specified website."""
     cert = ssl.get_server_certificate((hostname, 443))
-    certData = get_certificate_data(hostname, port)
+    certData = __get_certificate_data(hostname, port)
     return (cert, certData)
 
 
