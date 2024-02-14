@@ -27,7 +27,8 @@ class UserSession:
         self.accessHash = self.generate_sha256_hash(self.uname + ":" + self.pin)
         self.hmacKey = self.create_qr_code(self.uname, totp_label, totp_issuer)
     
-    def generate_sha256_hash(self, input_string: str) -> str:
+    @staticmethod
+    def generate_sha256_hash(input_string: str) -> str:
         """
         Returns the sha256 hash for the received input string.
         
@@ -40,18 +41,21 @@ class UserSession:
         sha256_hash = hashlib.sha256(input_string.encode()).hexdigest()
         return sha256_hash
 
-    def get_random_pin_Code(self) -> str:
+    @staticmethod
+    def get_random_pin_Code() -> str:
         """Returns a random four digit code."""
         chars = string.digits
         pin =  ''.join(random.choice(chars) for _ in range(4))
         return pin
 
-    def get_random_secret_key(self) -> str:
+    @staticmethod
+    def get_random_secret_key() -> str:
         """Returns a random secret key consisting of random A-Z characters and numbers from 2-8."""
         characters = string.ascii_uppercase + ''.join(str(i) for i in range(2, 8))
         return ''.join(random.choice(characters) for _ in range(16))
     
-    def create_qr_code(self, user_name: str, label: str, issuer: str) -> str:
+    @staticmethod
+    def create_qr_code(user_name: str, label: str, issuer: str) -> str:
         """
         Creates a QR code for the TOTP authentication app, saves it, and returns its hmac key.
         
@@ -64,7 +68,7 @@ class UserSession:
             str: The hmac key byte array as a string. 
         """
         # Replace this with your secret key (16 characters string composed of A-Z and 2-7). You can generate a random one using the randomSecretKey.py file.
-        secret_key = self.get_random_secret_key()
+        secret_key = UserSession.get_random_secret_key()
 
         # Create a TOTP object
         totp = pyotp.TOTP(secret_key)
