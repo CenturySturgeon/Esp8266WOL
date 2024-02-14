@@ -85,9 +85,19 @@ void checkCertificatesExpiration() {
   // Serial.println("Current time");
   // Serial.println(currentPosixTime);
   if (expirationTime > ipSiteCertExp && ! ipSiteWarnSent) {
-    Serial.println("Sending IP Site warning message");
+    Serial.println("Sending IP Site certificate expiration warning message");
     sendTelegramMessage("WARNING: IP Site certificate expires in 1 week or less.");
     ipSiteWarnSent = true;
+  }
+  if (expirationTime > serverCertExp && ! serverWarnSent) {
+    Serial.println("Sending Esp8266 certificate expiration warning message");
+    sendTelegramMessage("WARNING: Esp8266 certificate expires in 1 week or less.");
+    serverWarnSent = true;
+  }
+  if (expirationTime > telegramCertExp && ! telegramWarnSent) {
+    Serial.println("Sending Telegram API certificate expiration warning message");
+    sendTelegramMessage("WARNING: Telegram API certificate expires in 1 week or less.");
+    telegramWarnSent = true;
   }
 }
 
