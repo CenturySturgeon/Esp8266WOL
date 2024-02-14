@@ -22,6 +22,9 @@ UserSession userSessions[numUSessions] = {
 
 // NOTE: Each user session has its own hmacKey, represented in the example above by the values inside the keys "{ 0xFF, 0xFF, ... 0xFF}". You can read more about this in the "Generating Requirements" section of the github repository.
 
+// Address used to get your public IP
+String ipSiteAddress = {{IP_SITE_URL}};
+
 // Esp8266 static IP address
 IPAddress staticIP{{STATIC_IP}};
 // Your router's default local gateway

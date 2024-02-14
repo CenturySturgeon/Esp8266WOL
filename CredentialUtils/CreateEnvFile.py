@@ -6,7 +6,7 @@ def quotate(input: str) -> str:
     """Returns the input between double quotes."""
     return '\"' + input + '\"'
 
-def create_envVariables_file(router_info: tuple[str, str, tuple[int, int, int, int], tuple[int, int, int, int]],user_sessions: List[UserSession], static_ip: tuple[int, int, int, int], telegram_info: tuple[str, str, tuple[str, Dict | None]], cert_and_pkey: tuple[bytes, bytes], ip_site_cert: tuple[str, Dict | None]):
+def create_envVariables_file(router_info: tuple[str, str, tuple[int, int, int, int], tuple[int, int, int, int]],user_sessions: List[UserSession], static_ip: tuple[int, int, int, int], telegram_info: tuple[str, str, tuple[str, Dict | None]], cert_and_pkey: tuple[bytes, bytes], ip_site_info: tuple[tuple[str, Dict | None], str], path_sufix: str = ''):
     """Creates the envVariables.h file with the provided information."""
     # Get the placeHolder.h absolute file path
     module_dir = os.path.dirname(__file__)
@@ -33,10 +33,11 @@ def create_envVariables_file(router_info: tuple[str, str, tuple[int, int, int, i
     content = content.replace("{{SERVER_CERTIFICATE}}", certificate.decode().removesuffix('\n'))
     content = content.replace("{{PRIVATE_KEY}}", private_key.decode().removesuffix('\n'))
     content = content.replace("{{TELEGRAM_CERT}}", telegram_api_cert[0].removesuffix('\n'))
-    content = content.replace("{{IP_SITE_CERT}}", ip_site_cert[0].removesuffix('\n'))
+    content = content.replace("{{IP_SITE_CERT}}", ip_site_info[0][0].removesuffix('\n'))
+    content = content.replace("{{IP_SITE_URL}}", quotate(ip_site_info[1]))
 
     # print(content)
 
     # Write the envVariables.h file
-    with open('envVariables.h', 'w') as file:
+    with open(path_sufix + 'envVariables.h', 'w') as file:
         file.write(content)

@@ -39,6 +39,8 @@ telegram_info = (telegram_bot_token, telegram_chat_id, CertUtils.get_certificate
 
 ip_site_cert = CertUtils.get_certificate(ip_site_url)
 
+ip_site_info = (ip_site_cert, ip_site_url)
+
 # Create the envVariables.h file 
 
-CreateEnvFile.create_envVariables_file(router_info, user_sessions, esp8266_static_ip, telegram_info, cert_and_pkey, ip_site_cert)
+CreateEnvFile.create_envVariables_file(router_info, user_sessions, esp8266_static_ip, telegram_info, cert_and_pkey, ip_site_info, 'Esp8266Sketch/')

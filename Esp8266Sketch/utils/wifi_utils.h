@@ -17,8 +17,6 @@ const int timeZone = 0;
 const int daylightOffset = 0;
 // NTP server to synch the time with
 String ntpServer = "pool.ntp.org";
-// Address used to get your public IP
-String ipSiteAddress = "api.ipify.org";
 // Time interval in miliseconds to get the public IP, check if it changed and if so re-send it
 unsigned long checkPublicIpInterval = 3600000;
 
