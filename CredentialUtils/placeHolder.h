@@ -10,6 +10,13 @@
 const char* ssid = "{{WIFI_SSID}}";
 const char* password = "{{WIFI_PASSWORD}}";
 
+// Esp8266 static IP address
+IPAddress staticIP{{STATIC_IP}};
+// Your router's default local gateway
+IPAddress gateway{{LOCAL_GATEWAY}};
+// Your router's subnet
+IPAddress subnet{{SUBNET}};
+
 // Set the number of manageable user sessions (must match with the actual no. of sessions inside the userSessions array)
 const int numUSessions = {{NUMBER_OF_SESSIONS}};
 
@@ -24,13 +31,12 @@ UserSession userSessions[numUSessions] = {
 
 // Address used to get your public IP
 String ipSiteAddress = "{{IP_SITE_URL}}";
+// POSIX Expiration date for the IP site
+const int ipSiteCertExp = {{IP_SITE_CERT_EXPIRATION}};
+// Warning time interval before certificate expiration (604800 seconds = 1 week)
+const int certExpWarnInterval = 604800;
+bool ipSiteWarnSent = false;
 
-// Esp8266 static IP address
-IPAddress staticIP{{STATIC_IP}};
-// Your router's default local gateway
-IPAddress gateway{{LOCAL_GATEWAY}};
-// Your router's subnet
-IPAddress subnet{{SUBNET}};
 // Your telegram bot API token
 String BOT_TOKEN = "{{BOT_TOKEN}}";
 // Your telegram user id

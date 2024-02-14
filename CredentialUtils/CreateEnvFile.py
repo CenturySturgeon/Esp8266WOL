@@ -1,6 +1,6 @@
 import os
 from typing import List, Dict
-from CredentialUtils import UserSession
+from CredentialUtils import UserSession, CertUtils
 
 def create_envVariables_file(router_info: tuple[str, str, tuple[int, int, int, int], tuple[int, int, int, int]],user_sessions: List[UserSession], static_ip: tuple[int, int, int, int], telegram_info: tuple[str, str, tuple[str, Dict | None]], cert_and_pkey: tuple[bytes, bytes], ip_site_info: tuple[tuple[str, Dict | None], str], path_sufix: str = ''):
     """Creates the envVariables.h file with the provided information."""
@@ -17,7 +17,8 @@ def create_envVariables_file(router_info: tuple[str, str, tuple[int, int, int, i
     certificate, private_key = cert_and_pkey
 
     ip_site_cert_str = ip_site_info[0][0]
-    ip_site_posix_exp_date = ip_site_info[0][1]['notAfter']
+    # Gets the certificate's expiration date
+    ip_site_posix_exp_date = CertUtils.date_to_posix(ip_site_info[0][1]['notAfter'])
     ip_site_url = ip_site_info[1]
 
     # Replace placeholders with user values
@@ -35,6 +36,7 @@ def create_envVariables_file(router_info: tuple[str, str, tuple[int, int, int, i
     content = content.replace("{{TELEGRAM_CERT}}", telegram_api_cert[0].removesuffix('\n'))
     content = content.replace("{{IP_SITE_CERT}}", ip_site_cert_str.removesuffix('\n'))
     content = content.replace("{{IP_SITE_URL}}", ip_site_url)
+    content = content.replace("{{IP_SITE_CERT_EXPIRATION}}", str(ip_site_posix_exp_date))
 
     # print(content)
 

@@ -54,6 +54,9 @@ void setup() {
     Serial.println("MDNS responder started");
   }
 
+  // Certificate(s) expiration check
+  checkCertificatesExpiration();
+
   // Add the openssl cert and private key to the SecureServer's server
   secureServer.server.getServer().setRSACert(new BearSSL::X509List(serverCert), new BearSSL::PrivateKey(serverKey));
 
@@ -72,6 +75,20 @@ void setup() {
 
   secureServer.server.begin();
   serverHTTP.begin();
+}
+
+void checkCertificatesExpiration() {
+  unsigned long currentPosixTime = time(nullptr);
+  unsigned long expirationTime = currentPosixTime + certExpWarnInterval;
+  // Serial.println("Expiration time");
+  // Serial.println(expirationTime);
+  // Serial.println("Current time");
+  // Serial.println(currentPosixTime);
+  if (expirationTime > ipSiteCertExp && ! ipSiteWarnSent) {
+    Serial.println("Sending IP Site warning message");
+    sendTelegramMessage("WARNING: IP Site certificate expires in 1 week or less.");
+    ipSiteWarnSent = true;
+  }
 }
 
 void checkSessionTimeouts() {
