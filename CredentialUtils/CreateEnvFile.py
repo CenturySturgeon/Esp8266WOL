@@ -20,6 +20,10 @@ def create_envVariables_file(router_info: tuple[str, str, tuple[int, int, int, i
     # Gets the certificate's expiration date
     ip_site_posix_exp_date = CertUtils.date_to_posix(ip_site_info[0][1]['notAfter'])
     ip_site_url = ip_site_info[1]
+    server_cert_posix_exp_date = CertUtils.cert_posix_expiration_date(certificate)
+    telegram_posix_exp_date = CertUtils.date_to_posix(telegram_info[2][1]['notAfter'])
+
+    print(f'Ip Site certificate expiration: {CertUtils.posix_to_date(ip_site_posix_exp_date)}\nServer certificate expiration: {CertUtils.posix_to_date(server_cert_posix_exp_date)} \nTelegram certificate expiration: {CertUtils.posix_to_date(telegram_posix_exp_date)}')
 
     # Replace placeholders with user values
     content = content.replace("{{WIFI_SSID}}", wifi_name)
@@ -37,6 +41,8 @@ def create_envVariables_file(router_info: tuple[str, str, tuple[int, int, int, i
     content = content.replace("{{IP_SITE_CERT}}", ip_site_cert_str.removesuffix('\n'))
     content = content.replace("{{IP_SITE_URL}}", ip_site_url)
     content = content.replace("{{IP_SITE_CERT_EXPIRATION}}", str(ip_site_posix_exp_date))
+    content = content.replace("{{SERVER_CERT_EXPIRATION}}", str(server_cert_posix_exp_date))
+    content = content.replace("{{TELEGRAM_CERT_EXPIRATION}}", str(telegram_posix_exp_date))
 
     # print(content)
 

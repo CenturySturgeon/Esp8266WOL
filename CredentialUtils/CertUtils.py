@@ -119,7 +119,10 @@ def date_to_posix(date_str):
     
     return int(posix_time)
 
-def cert_posix_expiration_date(certificate: bytes) -> datetime:
+def posix_to_date(posix_timestamp):
+    return datetime.datetime.utcfromtimestamp(posix_timestamp)
+
+def cert_posix_expiration_date(certificate: bytes) -> int:
     """Returns the certificate's expiration date in POSIX time (the number of seconds since January 1, 1970, 00:00:00 (UTC))."""
     # Assuming cert_bytes is your X.509 certificate stored in bytes variable
     cert = x509.load_pem_x509_certificate(certificate, default_backend())

@@ -31,11 +31,21 @@ UserSession userSessions[numUSessions] = {
 
 // Address used to get your public IP
 String ipSiteAddress = "{{IP_SITE_URL}}";
-// POSIX Expiration date for the IP site
+// POSIX Expiration date for the IP site certificate
 const int ipSiteCertExp = {{IP_SITE_CERT_EXPIRATION}};
+
+// POSIX Expiration date for the Esp8266 certificate
+const int serverCertExp = {{SERVER_CERT_EXPIRATION}};
+
+// POSIX Expiration date for the Telegram API certificate
+const int telegramCertExp = {{TELEGRAM_CERT_EXPIRATION}};
+
+
 // Warning time interval before certificate expiration (604800 seconds = 1 week)
 const int certExpWarnInterval = 604800;
 bool ipSiteWarnSent = false;
+bool serverWarnSent = false;
+bool telegramWarnSent = false;
 
 // Your telegram bot API token
 String BOT_TOKEN = "{{BOT_TOKEN}}";
