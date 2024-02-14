@@ -7,8 +7,8 @@
 #include <ESP8266WiFi.h>
 
 // Your network credentials
-const char* ssid = {{WIFI_SSID}};
-const char* password = {{WIFI_PASSWORD}};
+const char* ssid = "{{WIFI_SSID}}";
+const char* password = "{{WIFI_PASSWORD}}";
 
 // Set the number of manageable user sessions (must match with the actual no. of sessions inside the userSessions array)
 const int numUSessions = {{NUMBER_OF_SESSIONS}};
@@ -23,7 +23,7 @@ UserSession userSessions[numUSessions] = {
 // NOTE: Each user session has its own hmacKey, represented in the example above by the values inside the keys "{ 0xFF, 0xFF, ... 0xFF}". You can read more about this in the "Generating Requirements" section of the github repository.
 
 // Address used to get your public IP
-String ipSiteAddress = {{IP_SITE_URL}};
+String ipSiteAddress = "{{IP_SITE_URL}}";
 
 // Esp8266 static IP address
 IPAddress staticIP{{STATIC_IP}};
@@ -32,9 +32,9 @@ IPAddress gateway{{LOCAL_GATEWAY}};
 // Your router's subnet
 IPAddress subnet{{SUBNET}};
 // Your telegram bot API token
-String BOT_TOKEN = {{BOT_TOKEN}};
+String BOT_TOKEN = "{{BOT_TOKEN}}";
 // Your telegram user id
-String CHAT_ID = {{CHAT_ID}};
+String CHAT_ID = "{{CHAT_ID}}";
 
 // Cert for ssl connection over HTTPS
 static const char serverCert[] PROGMEM = R"EOF(
