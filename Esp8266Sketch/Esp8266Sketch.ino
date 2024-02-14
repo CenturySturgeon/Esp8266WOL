@@ -101,6 +101,19 @@ void checkCertificatesExpiration() {
   }
 }
 
+void dailyChecks () {
+  // Group of functions that run once a day
+  unsigned long currentTime = millis();
+
+  // Check if checkPublicIpInterval amount of time has passed since the last check (86,400,000 miliseconds in a day)
+  if (currentTime - dailyCheckTime >= 86400000) {
+    // Update the last check time
+    dailyCheckTime = currentTime;
+    // Certificate(s) expiration check
+    checkCertificatesExpiration();
+  }
+}
+
 void checkSessionTimeouts() {
   unsigned long currentTime = millis();
 
@@ -120,6 +133,8 @@ void loop() {
   checkAndReconnect();
   // Check for changes in the public ip every hour
   checkPublicIpChange();
+  // Perform daily checks
+  dailyChecks();
 
   serverHTTP.handleClient();
   secureServer.server.handleClient();

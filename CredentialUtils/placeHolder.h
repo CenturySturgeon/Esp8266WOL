@@ -40,7 +40,8 @@ const int serverCertExp = {{SERVER_CERT_EXPIRATION}};
 // POSIX Expiration date for the Telegram API certificate
 const int telegramCertExp = {{TELEGRAM_CERT_EXPIRATION}};
 
-
+// Initial value for the dailyChecks marker, this is used to perform functions that need to run once per day
+unsigned long dailyCheckTime = millis();
 // Warning time interval before certificate expiration (604800 seconds = 1 week)
 const int certExpWarnInterval = 604800;
 bool ipSiteWarnSent = false;
