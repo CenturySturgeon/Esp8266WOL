@@ -119,6 +119,16 @@ def date_to_posix(date_str):
     
     return int(posix_time)
 
+def cert_expiration_date(certificate: bytes) -> datetime:
+    """Returns the """
+    # Assuming cert_bytes is your X.509 certificate stored in bytes variable
+    cert = x509.load_pem_x509_certificate(certificate, default_backend())
+
+    # Extracting the expiration date
+    expiration_date = date_to_posix(cert.not_valid_after_utc)
+
+    return expiration_date
+
 def save_cert_and_key(cert: bytes, key: bytes, cert_name: str, key_name: str, file_extension=".pem"):
     # Save to files
     with open(cert_name + file_extension, "wb") as f:
