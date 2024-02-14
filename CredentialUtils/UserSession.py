@@ -26,6 +26,7 @@ class UserSession:
         self.pin = self.get_random_pin_Code()
         self.accessHash = self.generate_sha256_hash(self.uname + ":" + self.pin)
         self.hmacKey = self.create_qr_code(self.uname, totp_label, totp_issuer)
+        print(f'{self.uname} PIN: {self.pin}')
     
     @staticmethod
     def generate_sha256_hash(input_string: str) -> str:

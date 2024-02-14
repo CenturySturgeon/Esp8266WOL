@@ -89,7 +89,7 @@ bool isValidIP(const String& ip) {
 
 // Synchronises the Esp's time with an NTP server of your choice
 void synchTime() {
-  // Synchronizes the time to an NTP server, after that, you can access the epoch time (# of seconds since Jan 1 1970) with time(nullptr)
+  // Synchronizes the time to an NTP server, after that, you can access the POSIX time (commonly known as epoch time), which is the number of seconds since January 1, 1970, 00:00:00 (UTC), using time(nullptr)
   Serial.println("Synching time: ");
   configTime(timeZone, daylightOffset, ntpServer);  // Get and set the time to UTC0 via an NTP server
   while (time(nullptr) < 24 * 3600) {
