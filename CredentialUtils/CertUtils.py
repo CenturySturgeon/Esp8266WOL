@@ -106,6 +106,19 @@ def create_certificate_and_private_key(private_key_size: int, country_name: str,
 
     return (certificate_pem, private_key_pem)
 
+def date_to_posix(date_str):
+    """Given a date string in the format 'MM DD hh:mm:ss YYYY TZ' return its POSIX time (the number of seconds since January 1, 1970, 00:00:00 (UTC))."""
+    # Define the format of the input date string
+    date_format = "%b %d %H:%M:%S %Y %Z"
+    
+    # Parse the input date string into a datetime object
+    dt = datetime.datetime.strptime(date_str, date_format)
+    
+    # Convert the datetime object to POSIX time (Unix timestamp)
+    posix_time = dt.timestamp()
+    
+    return int(posix_time)
+
 def save_cert_and_key(cert: bytes, key: bytes, cert_name: str, key_name: str, file_extension=".pem"):
     # Save to files
     with open(cert_name + file_extension, "wb") as f:
