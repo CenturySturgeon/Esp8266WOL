@@ -52,6 +52,18 @@ void setServerRoutes(SecureServer &secureServer) {
   secureServer.server.on("/copyIp", HTTP_GET, [&]() {
     secureServer.server.send(200, "text/html", copyIp_html);
   });
+  // Handles the amount of manual checks for changes in the public IP
+  secureServer.server.on("/copyIp", HTTP_POST, [&]() {
+    if (secureServer.ipRetries >= 1) {
+      // Serial.println("Checking ip change");
+      checkPublicIpChange ();
+      secureServer.ipRetries = secureServer.ipRetries - 1;
+      secureServer.redirectTo("/copyIp?ip=" + publicIp);
+    } else{
+      // Serial.println("No retries");
+      secureServer.server.send(403, "text/html", "403 Forbidden: Maximum amount of retries exhausted");
+    }
+  });
 
   // Login path handler
   secureServer.server.on("/login", HTTP_GET, [&]() {

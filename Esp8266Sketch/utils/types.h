@@ -33,6 +33,7 @@ struct SecureServer {
   int sessionCount;
   UserSession* userSessions;
   WakeOnLan WOL;
+  int ipRetries = 3;
 
   // Constructor for SecureServer
   SecureServer(int serverPort, UserSession *sessions, WiFiUDP &udp, int numUSessions)
@@ -48,7 +49,7 @@ struct SecureServer {
     delete[] userSessions;
   }
 
-  // Simple function to check if a client ip has already an active session
+  // Function that checks if a client ip has already an active session. If so, it closes the old one.
   bool is_authenticated(IPAddress ip, String token) {
     for (int i = 0; i < sessionCount; i++) {
       if (userSessions[i].ip == ip && userSessions[i].isLoggedIn && userSessions[i].token != "" && token.indexOf("Esp8266AuthCookie=" + userSessions[i].token) != -1) {
@@ -58,7 +59,7 @@ struct SecureServer {
     return false;
   }
 
-  // Handles the logout of a session for an ip
+  // Handles the session logout for an ip
   void logout(IPAddress ip) {
     for (int i = 0; i < sessionCount; i++) {
       if (userSessions[i].ip == ip) {
@@ -70,7 +71,7 @@ struct SecureServer {
     }
   }
 
-  // Simple function that checks the provided credentials match with the credentials on the sessions array
+  // Function that checks the provided credentials match with the credentials on the sessions array
   bool credentialsMatch(String credentials) {
     for (int i = 0; i < sessionCount; i++) {
       if (userSessions[i].credentials == credentials) {
@@ -80,7 +81,7 @@ struct SecureServer {
     return false;
   }
 
-  // Assigns the ip a session to the provided user name
+  // Assigns the ip to a session of the provided user name
   void assignSession(String credentials, IPAddress ip) {
     for (int i = 0; i < sessionCount; i++) {
       if (userSessions[i].credentials == credentials) {
@@ -133,6 +134,10 @@ struct SecureServer {
     // name:value, expiration age in seconds, path to were the cookie applies
     String cookie = "Esp8266AuthCookie=" + token + "; Max-Age=" + lifeTime + "; Path=/";
     server.sendHeader("Set-Cookie", cookie);
+  }
+
+  void resetIpRetries () {
+    ipRetries = 3;
   }
 
   void redirectTo(String path) {

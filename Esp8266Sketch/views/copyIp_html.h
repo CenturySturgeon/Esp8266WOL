@@ -122,9 +122,9 @@ const char copyIp_html[] PROGMEM = R"EOF(
             <i class="far fa-clone"></i>
             <span class="tooltip" id="copyTooltip">Copied!</span>
         </button>
-        <form action="myAction" method="POST">
+        <form action="copyIp" method="POST">
             <div class="input-group">
-                <button class="input" type="submit">SUBMIT</button>
+                <button class="input" type="submit">FETCH IP</button>
             </div>
         </form>
     </div>

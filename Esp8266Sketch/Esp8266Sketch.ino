@@ -111,6 +111,8 @@ void dailyChecks () {
     dailyCheckTime = currentTime;
     // Certificate(s) expiration check
     checkCertificatesExpiration();
+    // Reset the amount of manual checks available for changes in the public IP.
+    secureServer.resetIpRetries();
   }
 }
 
