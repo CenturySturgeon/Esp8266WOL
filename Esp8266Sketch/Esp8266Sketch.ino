@@ -1,17 +1,21 @@
+// Use Arduino library's ESP8266WiFi, more at https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi
 #include <ESP8266WiFi.h>
+// Use the NTPClient library by Fabrice Weinberg
 #include <NTPClient.h>
+// Use Arduino Wifi library, more at https://www.arduino.cc/reference/en/libraries/wifi/
 #include <WiFiUdp.h>
-
+// Use Arduino library's ESP8266WebServer and ESP8266WebServerSecure
 #include <ESP8266WebServer.h>
 #include <ESP8266WebServerSecure.h>
+// Use Arduino library's ESP8266mDNS, more at https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266mDNS
 #include <ESP8266mDNS.h>
 
-// For Time-based One Time Passwords
+// For Time-based One Time Passwords use the TOTP library by Luca Dentella
 #include <TOTP.h>
-// Importing Rhys Weatherly's cryptography library to use SHA256 encryption
+// Use the Crypto library by Rhys Weatherly to use SHA256 encryption
 #include <Crypto.h>
 #include <SHA256.h>
-// Importing a7md0's WakeOnLan library
+// For WOL functions use the WakeOnLan library by a7md0
 #include <WakeOnLan.h>
 
 // Import utils
