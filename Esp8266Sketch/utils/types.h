@@ -131,8 +131,12 @@ struct SecureServer {
   }
 
   void sendCookieToClient(String token, String lifeTime) {
-    // name:value, expiration age in seconds, path to were the cookie applies
-    String cookie = "Esp8266AuthCookie=" + token + "; Max-Age=" + lifeTime + "; Path=/";
+    // name:value, expiration age in seconds, path(s) to were the cookie applies
+    String cookie = "Esp8266AuthCookie=" + token + "; Max-Age=" + lifeTime + "; Path=/; Secure; HttpOnly; SameSite=Strict";
+    // Secure: Ensures that the cookie is only sent over HTTPS.
+    // HttpOnly:Prevents client-side scripts from accessing the cookie.
+    // SameSite=Strict: Ensures that the cookie is only sent in a first-party context, providing some protection against CSRF attacks.
+    
     server.sendHeader("Set-Cookie", cookie);
   }
 
