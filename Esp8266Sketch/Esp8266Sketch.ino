@@ -49,7 +49,7 @@ void setup() {
   // Start Serial for debugging
   Serial.begin(115200);
 
-  connectAndSendIp("On Start Public IP: ");
+  connectAndSendIp("On Start Public IP: https://");
 
   secureServer.WOL.setRepeat(3, 100);                                             // Repeat the packet three times with 100ms delay between
   secureServer.WOL.calculateBroadcastAddress(WiFi.localIP(), WiFi.subnetMask());  // Calculate and set broadcast address
