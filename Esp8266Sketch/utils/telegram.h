@@ -4,6 +4,7 @@
 
 #include <ESP8266WiFi.h>
 #include <WiFiClientSecure.h>
+// ArduinoJson by Benoit Blanchon
 #include <ArduinoJson.h>
 #include "../envVariables.h"
 
