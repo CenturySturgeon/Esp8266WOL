@@ -2,7 +2,7 @@
 
 Configure your Esp8266 as a web server, equipping it with the capability to dispatch magic packets for awakening any device within your local area network (LAN). The web server implements HTTPS for secure and private connections, bolstered by Two-Factor Authentication (2FA) through Time-Based One-Time Passwords (TOTP) to thwart potential threats seeking to rouse your devices maliciously.
 
-![Diagram](https://github.com/CenturySturgeon/Esp8266WOL/blob/main/WOL_Diagram.svg)
+![Diagram](WOL_Diagram.svg)
 
 ### NOTES
 
@@ -107,7 +107,7 @@ requirements.txt
 WOL_Diagram.svg
 ```
 
-After executing the 'envVariablesCreator.py' script, each user will receive a randomly generated four-digit PIN as their password. This PIN will be displayed in the terminal alongside their username, so it's important to save this information. Additionally, QR codes will be generated for each user. These QR codes can be scanned using your preferred TOTP authentication app (such as Google Authenticator or Microsoft Authenticator) to enable one-time passwords.
+After executing the 'envVariablesCreator.py' script, each user will receive a randomly generated four-digit PIN as their password. This PIN will be displayed in the terminal alongside their username, so it's important to save this information. Additionally, QR codes will be generated for each user and stored inside the "QRcodes" directory. These QR codes can be scanned using your preferred TOTP authentication app (such as Google Authenticator or Microsoft Authenticator) to enable one-time passwords.
 
 Furthermore, a new file named 'envVariables.h' will be created within the 'Esp8266Sketch' folder:
 

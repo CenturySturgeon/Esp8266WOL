@@ -1,4 +1,5 @@
 envVariables.h
+QRcodes/
 *.png
 *.env
 .venv

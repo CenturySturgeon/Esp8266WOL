@@ -4,6 +4,7 @@ import pyotp
 import base64
 import qrcode
 import hashlib
+import os
 
 
 class UserSession:
@@ -87,8 +88,11 @@ class UserSession:
         hmac_key = ', '.join([f'0x{byte:02X}' for byte in byte_array])
         # print(f"uint8_t hmacKey[] = {{ {hmac_key} }};")
 
+        # Check if the QRcodes folder exists, if not, create it
+        os.makedirs('./QRcodes/', exist_ok=True) 
+
         # Save the QR code in the same folder as the script is located
-        img.save(user_name + ".png")
+        img.save("./QRcodes/" + user_name + ".png")
 
         return hmac_key
 
