@@ -1,7 +1,7 @@
 // copyIp_html.h
 
 const char copyIp_html[] PROGMEM = R"EOF(
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -20,17 +20,10 @@ const char copyIp_html[] PROGMEM = R"EOF(
             justify-content: center;
             align-items: center;
             height: 100vh;
+            overflow: hidden;
+            /* Disable vertical scrolling */
         }
 
-        .container {
-            background: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
-            text-align: center;
-            position: relative;
-        }
 
         .container h1 {
             color: #1A73E8;
@@ -85,28 +78,48 @@ const char copyIp_html[] PROGMEM = R"EOF(
             font-size: x-large;
         }
 
-        /* Add tooltip style */
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+            position: relative;
+            max-height: calc(100vh - 40px);
+            /* Adjust max-height to fit the viewport */
+            z-index: 1;
+            /* Ensure container is behind the tooltip */
+        }
+
         .tooltip {
             position: absolute;
             background: #1A73E8;
             color: #fff;
-            margin: 0px 10px;
             padding: 5px 10px;
+            font-size: medium;
             border-radius: 5px;
             opacity: 0;
             transition: opacity 0.3s;
+            z-index: 999;
+            /* Add a higher z-index value */
+            bottom: calc(100% + 10px);
+            /* Position above the button */
+            left: 50%;
+            /* Center horizontally */
+            transform: translateX(-50%);
+            /* Center horizontally */
         }
 
         .tooltip::after {
             content: " ";
             position: absolute;
-            top: 50%;
-            right: 100%;
-            /* To the left of the tooltip */
-            margin-top: -5px;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
             border-width: 5px;
             border-style: solid;
-            border-color: transparent #1A73E8 transparent transparent;
+            border-color: #1A73E8 transparent transparent transparent;
         }
 
         .tooltip.show {
@@ -149,7 +162,7 @@ const char copyIp_html[] PROGMEM = R"EOF(
         function copyToClipboard() {
             const ipAddress = document.getElementById("ipAddress");
             const textArea = document.createElement("textarea");
-            textArea.value = ipAddress.innerText;
+            textArea.value = "https://" + ipAddress.innerText;
             document.body.appendChild(textArea);
             textArea.select();
             document.execCommand('copy');

@@ -18,6 +18,7 @@ const char status_html[] PROGMEM = R"EOF(
             justify-content: center;
             align-items: center;
             height: 100vh;
+            overflow: hidden; /* Disable vertical scrolling */
         }
 
         .container {
@@ -28,6 +29,8 @@ const char status_html[] PROGMEM = R"EOF(
             width: 300px;
             text-align: center;
             position: relative;
+            max-height: calc(100vh - 40px); /* Adjust max-height to fit the viewport */
+            overflow-y: auto; /* Enable vertical scrolling if content exceeds viewport */
         }
 
         .mark {

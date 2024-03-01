@@ -16,6 +16,7 @@ const char wol_html[] PROGMEM = R"EOF(
             justify-content: center;
             align-items: center;
             height: 100vh;
+            overflow: hidden; /* Disable vertical scrolling */
         }
         .container {
             background: #fff;
@@ -24,6 +25,8 @@ const char wol_html[] PROGMEM = R"EOF(
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 300px;
             text-align: center;
+            max-height: calc(100vh - 40px); /* Adjust max-height to fit the viewport */
+            overflow-y: auto; /* Enable vertical scrolling if content exceeds viewport */
         }
         .container h2 {
             margin: 0;
