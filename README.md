@@ -99,6 +99,7 @@ The .env file should reside at the same directory level as the envVariablesCreat
 ```
 CredentialUtils/
 Esp8266Sketch/
+.env
 .gitignore
 envVariablesCreator.py
 README.md
