@@ -146,7 +146,7 @@ void connectAndSendIp(String messagePrefix) {
 void checkAndReconnect() {
   if (WiFi.status() != WL_CONNECTED) {
     Serial.println("WiFi connection lost. Reconnecting...");
-    connectAndSendIp("WiFi connection lost. Public IP: ");
+    connectAndSendIp("WiFi connection lost; new public IP: https://");
     delay(3000);
   }
 }
@@ -165,7 +165,7 @@ void checkPublicIpChange () {
     String currentPublicIp = persintentGetPublicIp();
     if (currentPublicIp != publicIp) {
       // Public IP has changed, send the new one
-      sendTelegramMessage("Your public IP changed to: " + currentPublicIp);
+      sendTelegramMessage("Your public IP changed to: https://" + currentPublicIp);
       publicIp = currentPublicIp;  // Update the previous value
     }
   }
