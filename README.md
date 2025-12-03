@@ -6,21 +6,21 @@ Configure your Esp8266 as a web server, equipping it with the capability to disp
 
 ### NOTES
 
-* Even though the essential custom variables are found on the 'envVariables.h' file, on the 'wifi_utils.h' file you'll find aditional customizable variables you can modify, like the DNS server used, the NTP server to synch the time with, the time interval to check for public IP changes and more.
+* Even though the essential custom variables should be found on the `envVariables.h` file, on the `wifi_utils.h` file you'll find aditional customizable variables you can modify, like the DNS server used, the NTP server to synch the time with, the time interval to check for public IP changes and more.
 
-* The Crypto library is used to safekeep passwords as SHA-256 encrypted hashes and not in plain text. You can install this library directly from the Arduino IDE, it's the one from Rhys Weatherly, more of this in the github repo https://github.com/rweather/arduinolibs. To generate your hashes, you can use the hash256Generator.py file.
+* The Crypto library is used to safekeep passwords as SHA-256 encrypted hashes and not in plain text. You can install this library directly from the Arduino IDE, it's the one from Rhys Weatherly, more of this in the github repo [arduinolibs](https://github.com/rweather/arduinolibs). To generate your hashes, you can use the `hash256Generator.py` file.
 
-* Each user will be assigned a random, four digit pin as a password. This four digit pin will be printed to the terminal, alongside its username, after running the 'envVariablesCreator.py' script. Be sure to write them down. Also, you can manually assign the four digit pin to any of your liking, but you'll have to calculate its hash and place it inside the 'envVariables.h' file.
+* Each user will be assigned a random, four digit pin as a password. This four digit pin will be printed to the terminal, alongside its username, after running the `envVariablesCreator.py` script. Be sure to write them down. Also, you can manually assign the four digit pin to any of your liking, but you'll have to calculate its hash and place it inside the 'envVariables.h' file.
 
 * On login submission, the created hash is created from a mix of the username plus the ":" character and the password (the four digit pin).
 
-```
+```c
 calculateSHA256Hash(username:password);
 ```
 
-The hash generation combination can be modified on the 'routes.h' file on line 66, although I'd recommend that your hashes remain some kind of mix of the username and password.
+The hash generation combination can be modified on the `routes.h` file on `line 66`, although it is recommended that your hashes remain some kind of mix of the username and password.
 
-```
+```c
 String credentials = calculateSHA256Hash(username + ":" + password);
 ```
 
@@ -29,29 +29,31 @@ String credentials = calculateSHA256Hash(username + ":" + password);
 ### Arduino Libraries
 
 You'll require to install the following Arduino libraries in order for the code to work (all of them can be installed through the Arduino IDE):
-```
-Arduino's ESP8266WiFi (for WiFiClient and WiFiClientSecure) https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi
 
-Arduino's Wifi library, more at https://www.arduino.cc/reference/en/libraries/wifi/
+**Note**: First four libraries are auto-installed when adding `http://arduino.esp8266.com/stable/package_esp8266com_index.json` on the `Additional boards manager URLs` section of your Arduino IDE's settings.
 
-Arduino's ESP8266WebServer and ESP8266WebServerSecure https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WebServer
+- Arduino's ESP8266WiFi (for WiFiClient and WiFiClientSecure) https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WiFi
 
-Arduino's ESP8266mDNS https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266mDNS
+- Arduino's Wifi library, more at https://www.arduino.cc/reference/en/libraries/wifi/
 
-NTPClient library by Fabrice Weinberg https://www.arduino.cc/reference/en/libraries/ntpclient/
+- Arduino's ESP8266WebServer and ESP8266WebServerSecure https://github.com/esp8266/Arduino/tree/master/libraries/ESP8266WebServer
 
-TOTP library by Luca Dentella https://www.arduino.cc/reference/en/libraries/totp-library/
+- Arduino's ESP8266mDNS https://github.com/esp8266/Arduino/blob/master/libraries/ESP8266mDNS
 
-Crypto library by Rhys Weatherly https://www.arduino.cc/reference/en/libraries/crypto/
+1. NTPClient library by Fabrice Weinberg https://www.arduino.cc/reference/en/libraries/ntpclient/
 
-WOL library by a7md0 https://github.com/a7md0/WakeOnLan.
+2. TOTP library by Luca Dentella https://www.arduino.cc/reference/en/libraries/totp-library/
 
-ArduinoJson by Benoit Blanchon https://www.arduino.cc/reference/en/libraries/arduinojson/
-```
+3. Crypto library by Rhys Weatherly https://www.arduino.cc/reference/en/libraries/crypto/
+
+4. WOL library by a7md0 https://github.com/a7md0/WakeOnLan.
+
+5. ArduinoJson by Benoit Blanchon https://www.arduino.cc/reference/en/libraries/arduinojson/
+
 ### .Env File
-To enable the functionality of this code, it's essential to generate an additional file named "envVariables.h". This file is automatically generated through the execution of the envVariablesCreator.py script. No adjustments are needed in the Python script itself; instead, you'll require an .env file to store all pertinent information. Here's a glimpse of the structure of this .env file:
+To enable the functionality of this code, it's essential to generate an additional file named "envVariables.h". This file is automatically generated through the execution of the envVariablesCreator.py script. No adjustments are needed in the Python script itself; instead, you'll require an `.env` file to store all pertinent information. Here's a glimpse of the structure of this .env file:
 
-```
+```bash
 # Set your network credentials:
 WIFI_NAME=YOUR_WIFI_NETWORK_NAME
 WIFI_PASSWORD=YOUR_WIFI_PASSWORD
@@ -94,29 +96,34 @@ DOMAIN_NAME=esp8266.local
 CERT_LIFESPAN_DAYS=365
 ```
 
-The .env file should reside at the same directory level as the envVariablesCreator.py script. After its creation, your file structure should resemble the following:
+The `.env` file should reside at the same level as the `envVariablesCreator.py` script. After its creation, your file structure should resemble the following:
 
 ```
-CredentialUtils/
+.
+├── CredentialUtils/
+├── Esp8266Sketch/
+├── .env
+├── .gitignore
+├── envVariablesCreator.py
+├── README.md
+├── requirements.txt
+└── WOL_Diagram.svg
+```
+
+Be patient when running the `envVariablesCreator.py` script, as it may take a while to retrieve the certificates.
+
+**Note**: The cert utils might fail on current Mac silicon.
+
+After executing the `envVariablesCreator.py` script, each user will receive a randomly generated four-digit PIN as their password. This PIN will be displayed in the terminal alongside their username, so it's important to save this information. Additionally, QR codes will be generated for each user and stored inside the "QRcodes" directory. These QR codes can be scanned using your preferred TOTP authentication app (such as Google Authenticator or Microsoft Authenticator) to enable one-time passwords.
+
+Furthermore, a new file named `envVariables.h` will be created within the 'Esp8266Sketch' folder:
+
+```
 Esp8266Sketch/
-.env
-.gitignore
-envVariablesCreator.py
-README.md
-requirements.txt
-WOL_Diagram.svg
-```
-
-After executing the 'envVariablesCreator.py' script, each user will receive a randomly generated four-digit PIN as their password. This PIN will be displayed in the terminal alongside their username, so it's important to save this information. Additionally, QR codes will be generated for each user and stored inside the "QRcodes" directory. These QR codes can be scanned using your preferred TOTP authentication app (such as Google Authenticator or Microsoft Authenticator) to enable one-time passwords.
-
-Furthermore, a new file named 'envVariables.h' will be created within the 'Esp8266Sketch' folder:
-
-```
-Esp8266Sketch/
-├── utils/
-├── views/
-├── envVariables.h
-└── Esp8266Sketch.ino
+  ├── utils/
+  ├── views/
+  ├── envVariables.h
+  └── Esp8266Sketch.ino
 ```
 
 NOTE: Remember to write down each user's four digit pin, as it will not be retrievable after the terminal closes or gets cleared.
@@ -155,7 +162,7 @@ issuer: Identifies the main name for your one-time code in your chosen TOTP app.
 You can have as many user sessions as you like, limited only by the storage and RAM capabilities of the ESP8266. Alternatively, you can also manually assign each user its four digit pin code, as well as its QR code, but it would require you to modify the 'envVariables.h' file.
 To create your users manually, run the 'envVariablesCreator.py' as you normally would, and open the 'envVariables.h' file. Inside of it, you'll see an array of the user sessions that looks as follows:
 
-```
+```c
 UserSession userSessions[numUSessions] = {
   // Hash is made from the string "admin:admin" (the username is "admin" and the password is "admin" as well)
   { "The Admin", "8da193366e1554c08b2870c50f737b9587c3372b656151c4a96028af26f51334", { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, 60},
@@ -166,7 +173,7 @@ UserSession userSessions[numUSessions] = {
 
 As you can see, each user session is composed of an username, a hash (in order to not save passwords in plain text), an hmac key (for the totp QR code), and a timeout value. From this values, the only ones you shouldn't modify manually are the hash and the hmac key as they are automatically generated. Fortunatelly, you can make use of the utilities to create them both, just create a python script at the same level as the 'envVariablesCreator.py' and paste the following code: 
 
-```
+```python
 from CredentialUtils import UserSession
 # Get the hash from the 'USERNAME:PIN_CODE' string combination (remember, the esp8266 uses a mix of the username and the pin code to create the hash, so your input should look like that).
 print(UserSession.generate_sha256_hash("USERNAME:PIN_CODE"))
@@ -178,24 +185,24 @@ After running this script, a new QR code will be created for the user, with its 
 
 #### TELEGRAM_BOT_TOKEN,  TELEGRAM_CHAT_ID, & TELEGRAM_API_URL
 
-These variables store information regarding your telegram bot. This is usefull if you're planning to access your SoC's website from outside the LAN since you'll need the public IP from your router. This code makes it so that the Esp8266 sends you the public IP upon startup and keeps looking for changes in the public IP every hour (you can change the interval on the wifi_utils.h file), re-sends it if it changed, all of this via your telegram bot.
+These variables store information regarding your telegram bot. This is usefull if you're planning to access your SoC's website from outside the LAN since you'll need the public IP from your router. This code makes it so that the Esp8266 sends you the public IP upon startup and keeps looking for changes in the public IP every hour (you can change the interval on the `wifi_utils.h` file), re-sends it if it changed, all of this via your telegram bot.
 
-```
-TELEGRAM_BOT_TOKEN: When creating a telegram bot using the 'BotFather' it will throw you a token to access the HTTP API; this is your bot token.
-TELEGRAM_CHAT_ID: This is your telegram user id, since the bot will be sending messages, in behalf of the Esp8266 module, to you.
-TELEGRAM_API_URL: This is the link to telegram's API. It is needed since the 'envVariablesCreator.py' retrieves its certificate so the SoC can verify that the identity of the API, avoiding man-in-the-middle attacks.
-```
+
+- **TELEGRAM_BOT_TOKEN**: When creating a telegram bot using the 'BotFather' it will throw you a token to access the HTTP API; this is your bot token.
+
+- **TELEGRAM_CHAT_ID**: This is your telegram user id, since the bot will be sending messages, in behalf of the Esp8266 module, to you.
+
+- **TELEGRAM_API_URL**: This is the link to telegram's API. It is needed since the 'envVariablesCreator.py' retrieves its certificate so the SoC can verify that the identity of the API, avoiding man-in-the-middle attacks.
+
 
 #### CERTIFICATE & PRIVATE KEY Variables
 
 In order to use HTTPS secure connections, the SoC webserver needs to use an SSL certificate and a private RSA key (which will be generated by the 'envVariablesCreator.py' script). The SSL certificate will be self-signed so you don't need to buy one (you could buy one if you really want to), the only issue is that when you connect to the SoC's website the connection will be marked as insecure and you'll likely get a warning in your browser (which you can ignore).
 
-```
-PRIVATE_KEY_SIZE: The size for the private key in bits. A key size of 2048 bits is great for security but the SoC might run out of memory, if that happens try with 1024.
-COUNTRY_CODE: Country code of two letters
-STATE: The country's state the certificate will show.
-CITY: The state's city the certificate will show
-ORG: The organization the certificate will show
-DOMAIN_NAME: The domain name for the SoC's website (you should probably use the default esp8266.local)
-CERT_LIFESPAN_DAYS: The number of days before the certificate and private key expire.
-```
+- **PRIVATE_KEY_SIZE**: The size for the private key in bits. A key size of 2048 bits is great for security but the SoC might run out of memory, if that happens try with 1024.
+- **COUNTRY_CODE**: Country code of two letters
+- **STATE**: The country's state the certificate will show.
+- **CITY**: The state's city the certificate will show
+- **ORG**: The organization the certificate will show
+- **DOMAIN_NAME**: The domain name for the SoC's website (you should probably use the default esp8266.local)
+- **CERT_LIFESPAN_DAYS**: The number of days before the certificate and private key expire.
