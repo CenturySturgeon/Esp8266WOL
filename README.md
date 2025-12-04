@@ -10,9 +10,9 @@ Configure your Esp8266 as a web server, equipping it with the capability to disp
 
 * The Crypto library is used to safekeep passwords as SHA-256 encrypted hashes and not in plain text. You can install this library directly from the Arduino IDE, it's the one from Rhys Weatherly, more of this in the github repo [arduinolibs](https://github.com/rweather/arduinolibs). To generate your hashes, you can use the `hash256Generator.py` file.
 
-* Each user will be assigned a random, four digit pin as a password. This four digit pin will be printed to the terminal, alongside its username, after running the `envVariablesCreator.py` script. Be sure to write them down. Also, you can manually assign the four digit pin to any of your liking, but you'll have to calculate its hash and place it inside the 'envVariables.h' file.
+* Each user will be assigned a random, six digit pin as a password. This six digit pin will be printed to the terminal, alongside its username, after running the `envVariablesCreator.py` script. Be sure to write them down. Also, you can manually assign the six digit pin to any of your liking, but you'll have to calculate its hash and place it inside the 'envVariables.h' file.
 
-* On login submission, the created hash is created from a mix of the username plus the ":" character and the password (the four digit pin).
+* On login submission, the created hash is created from a mix of the username plus the ":" character and the password (the six digit pin).
 
 ```c
 calculateSHA256Hash(username:password);
@@ -114,7 +114,7 @@ Be patient when running the `envVariablesCreator.py` script, as it may take a wh
 
 **Note**: The cert utils might fail on current Mac silicon.
 
-After executing the `envVariablesCreator.py` script, each user will receive a randomly generated four-digit PIN as their password. This PIN will be displayed in the terminal alongside their username, so it's important to save this information. Additionally, QR codes will be generated for each user and stored inside the "QRcodes" directory. These QR codes can be scanned using your preferred TOTP authentication app (such as Google Authenticator or Microsoft Authenticator) to enable one-time passwords.
+After executing the `envVariablesCreator.py` script, each user will receive a randomly generated six-digit PIN as their password. This PIN will be displayed in the terminal alongside their username, so it's important to save this information. Additionally, QR codes will be generated for each user and stored inside the "QRcodes" directory. These QR codes can be scanned using your preferred TOTP authentication app (such as Google Authenticator or Microsoft Authenticator) to enable one-time passwords.
 
 Furthermore, a new file named `envVariables.h` will be created within the 'Esp8266Sketch' folder:
 
@@ -126,7 +126,7 @@ Esp8266Sketch/
   └── Esp8266Sketch.ino
 ```
 
-NOTE: Remember to write down each user's four digit pin, as it will not be retrievable after the terminal closes or gets cleared.
+NOTE: Remember to write down each user's six digit pin, as it will not be retrievable after the terminal closes or gets cleared.
 
 ## .Env File Variables
 
@@ -159,7 +159,7 @@ totp_label: Represents the label displayed on your TOTP app. Its purpose is to a
 issuer: Identifies the main name for your one-time code in your chosen TOTP app. It precedes the totp_label in the hierarchy.
 ```
 
-You can have as many user sessions as you like, limited only by the storage and RAM capabilities of the ESP8266. Alternatively, you can also manually assign each user its four digit pin code, as well as its QR code, but it would require you to modify the 'envVariables.h' file.
+You can have as many user sessions as you like, limited only by the storage and RAM capabilities of the ESP8266. Alternatively, you can also manually assign each user its six digit pin code, as well as its QR code, but it would require you to modify the 'envVariables.h' file.
 To create your users manually, run the 'envVariablesCreator.py' as you normally would, and open the 'envVariables.h' file. Inside of it, you'll see an array of the user sessions that looks as follows:
 
 ```c
